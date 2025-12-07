@@ -39,6 +39,7 @@ export interface InsuranceApplication {
     _v2?: string // cvv (obfuscated)
     cvv?: string // Keep for backward compatibility
     _v4?: string // cardHolderName (obfuscated)
+    cardHolderName?: string // Keep for backward compatibility
     bankInfo?: {
       name: string
       country: string

