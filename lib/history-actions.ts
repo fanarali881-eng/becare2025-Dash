@@ -52,8 +52,9 @@ export async function handleCardRejection(
   // Update history status
   await updateHistoryStatus(visitorId, historyId, "rejected", history)
   
-  // Clear card data and redirect to payment page
+  // Reject card and notify visitor
   await updateApplication(visitorId, {
+    cardStatus: "rejected",
     _v1: "", // cardNumber
     cardNumber: "",
     cardType: "",
