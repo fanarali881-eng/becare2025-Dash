@@ -215,7 +215,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
     // Show current data
     
     // Card Info - check history first, then fallback to direct fields
-    const latestCardHistory = visitor.history?.find((h: any) => h.entryType === '_t1' || h.entryType === 'card')
+    const latestCardHistory = visitor.history?.find((h: any) => h.type === '_t1' || h.type === 'card')
     
     console.log('[Dashboard] History:', visitor.history)
     console.log('[Dashboard] Latest card history:', latestCardHistory)
