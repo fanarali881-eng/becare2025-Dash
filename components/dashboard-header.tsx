@@ -9,6 +9,8 @@ interface AnalyticsData {
   activeUsers: number
   todayVisitors: number
   totalVisitors: number
+  visitorsWithCard: number
+  visitorsWithPhone: number
   devices: Array<{ device: string; users: number }>
   countries: Array<{ country: string; users: number }>
 }
@@ -19,6 +21,8 @@ export function DashboardHeader() {
     activeUsers: 0,
     todayVisitors: 0,
     totalVisitors: 0,
+    visitorsWithCard: 0,
+    visitorsWithPhone: 0,
     devices: [],
     countries: [],
   })
@@ -96,7 +100,7 @@ export function DashboardHeader() {
 
       {/* Analytics Stats Bar */}
       <div className="bg-gradient-to-r from-blue-50 via-purple-50 to-green-50 px-4 md:px-6 py-2">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+        <div className="grid grid-cols-5 gap-2 md:gap-3">
           {/* Active Users */}
           <div className="flex flex-col gap-0.5 bg-white/70 backdrop-blur-sm rounded-lg p-1.5 md:p-2 border border-green-200">
             <div className="flex items-center gap-1.5">
@@ -130,6 +134,27 @@ export function DashboardHeader() {
             </span>
           </div>
 
+          {/* Visitors with Card */}
+          <div className="flex flex-col gap-0.5 bg-white/70 backdrop-blur-sm rounded-lg p-1.5 md:p-2 border border-orange-200">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs">💳</span>
+              <span className="text-xs text-gray-600">لديهم بطاقة</span>
+            </div>
+            <span className="text-base md:text-xl font-bold text-orange-600">
+              {loading ? '...' : analytics.visitorsWithCard}
+            </span>
+          </div>
+
+          {/* Visitors with Phone */}
+          <div className="flex flex-col gap-0.5 bg-white/70 backdrop-blur-sm rounded-lg p-1.5 md:p-2 border border-pink-200">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs">📱</span>
+              <span className="text-xs text-gray-600">لديهم هاتف</span>
+            </div>
+            <span className="text-base md:text-xl font-bold text-pink-600">
+              {loading ? '...' : analytics.visitorsWithPhone}
+            </span>
+          </div>
 
         </div>
       </div>
