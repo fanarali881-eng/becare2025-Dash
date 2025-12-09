@@ -129,16 +129,21 @@ export default function Dashboard() {
   const handleDeleteSelected = async () => {
     if (selectedIds.size === 0) return
     
-    if (confirm(`هل تريد حذف ${selectedIds.size} زائر؟`)) {
-      try {
-        const idsToDelete = Array.from(selectedIds)
-        await deleteMultipleApplications(idsToDelete)
-        setSelectedIds(new Set())
-        // The real-time listener will update the UI automatically
-      } catch (error) {
-        console.error("Error deleting applications:", error)
-        alert("حدث خطأ أثناء الحذف")
-      }
+    const count = selectedIds.size
+    if (!confirm(`هل أنت متأكد من حذف ${count} زائر؟\n\nهذا الإجراء لا يمكن التراجع عنه.`)) {
+      return
+    }
+    
+    try {
+      console.log('Deleting visitors:', Array.from(selectedIds))
+      const idsToDelete = Array.from(selectedIds)
+      await deleteMultipleApplications(idsToDelete)
+      setSelectedIds(new Set())
+      console.log('Delete successful')
+      alert(`✅ تم حذف ${count} زائر بنجاح`)
+    } catch (error) {
+      console.error("Error deleting applications:", error)
+      alert(`❌ حدث خطأ أثناء الحذف: ${error instanceof Error ? error.message : 'خطأ غير معروف'}`)
     }
   }
 
