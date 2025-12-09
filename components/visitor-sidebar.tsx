@@ -161,7 +161,12 @@ export function VisitorSidebar({
                 <div className="flex-1 min-w-0">
                   {/* Name & Time Ago */}
                   <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-semibold text-gray-900 truncate text-base landscape:text-sm">{visitor.ownerName}</h3>
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 truncate text-base landscape:text-sm">{visitor.ownerName}</h3>
+                      <span className="text-xs font-medium text-white bg-teal-600 px-2 py-0.5 rounded whitespace-nowrap">
+                        {getPageName(visitor.currentStep)}
+                      </span>
+                    </div>
                     
                     {/* Time ago indicator */}
                     <div className="flex items-center gap-1 text-xs landscape:text-[10px] text-gray-500 font-medium whitespace-nowrap">
