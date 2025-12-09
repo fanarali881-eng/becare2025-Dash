@@ -62,7 +62,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
         case "payment":
           // Modern pages use redirectPage, legacy pages use currentStep
           updates = { 
-            redirectPage: "payment" as any,
+            redirectPage: "check" as any,
             currentStep: "_st1" as any 
           }
           break
