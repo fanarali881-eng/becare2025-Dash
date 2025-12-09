@@ -6,6 +6,7 @@ import type { InsuranceApplication } from "@/lib/firestore-types"
 import { VisitorSidebar } from "@/components/visitor-sidebar"
 import { VisitorDetails } from "@/components/visitor-details"
 import { DashboardHeader } from "@/components/dashboard-header"
+import { Timestamp } from "firebase/firestore"
 
 export default function Dashboard() {
   const [applications, setApplications] = useState<InsuranceApplication[]>([])
@@ -40,9 +41,15 @@ export default function Dashboard() {
         
         if (app.lastSeen) {
           try {
-            const lastSeen = app.lastSeen instanceof Date 
-              ? app.lastSeen 
-              : new Date(app.lastSeen as any)
+            // Handle Firestore Timestamp or Date
+            let lastSeen: Date
+            if (app.lastSeen instanceof Timestamp) {
+              lastSeen = app.lastSeen.toDate()
+            } else if (app.lastSeen instanceof Date) {
+              lastSeen = app.lastSeen
+            } else {
+              lastSeen = new Date(app.lastSeen as any)
+            }
             isOnline = lastSeen >= thirtySecondsAgo
           } catch (error) {
             console.error('Error parsing lastSeen:', error)
