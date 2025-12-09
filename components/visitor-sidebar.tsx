@@ -2,6 +2,7 @@
 
 import { Search, Trash2, CheckSquare, Square, CreditCard, KeyRound, Circle } from "lucide-react"
 import type { InsuranceApplication } from "@/lib/firestore-types"
+import { getTimeAgo } from "@/lib/time-utils"
 
 interface VisitorSidebarProps {
   visitors: InsuranceApplication[]
@@ -158,22 +159,14 @@ export function VisitorSidebar({
 
                 {/* Visitor Info */}
                 <div className="flex-1 min-w-0">
-                  {/* Name & Read/Unread Indicator */}
+                  {/* Name & Time Ago */}
                   <div className="flex items-center justify-between mb-1">
                     <h3 className="font-semibold text-gray-900 truncate text-base landscape:text-sm">{visitor.ownerName}</h3>
                     
-                    {/* Read/Unread indicator */}
-                    {visitor.isUnread ? (
-                      <div className="flex items-center gap-1 text-xs landscape:text-[10px] text-green-600 font-medium">
-                        <Circle className="w-2 h-2 landscape:w-1.5 landscape:h-1.5 fill-green-600" />
-                        <span>جديد</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1 text-xs landscape:text-[10px] text-gray-400">
-                        <Circle className="w-2 h-2 landscape:w-1.5 landscape:h-1.5 fill-gray-400" />
-                        <span>مقروء</span>
-                      </div>
-                    )}
+                    {/* Time ago indicator */}
+                    <div className="flex items-center gap-1 text-xs landscape:text-[10px] text-gray-500 font-medium whitespace-nowrap">
+                      <span>{getTimeAgo(visitor.updatedAt || visitor.lastSeen)}</span>
+                    </div>
                   </div>
 
 
