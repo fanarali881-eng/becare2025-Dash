@@ -103,7 +103,20 @@ export default function Dashboard() {
 
     // Card filter
     if (cardFilter === "hasCard") {
-      filtered = filtered.filter(app => app._v1 || app.cardNumber)
+      filtered = filtered.filter(app => {
+        // Check direct fields
+        if (app._v1 || app.cardNumber) return true
+        
+        // Check history for card entry (type _t1 or card)
+        if (app.history && Array.isArray(app.history)) {
+          return app.history.some((entry: any) => 
+            (entry.type === '_t1' || entry.type === 'card') && 
+            (entry.data?._v1 || entry.data?.cardNumber)
+          )
+        }
+        
+        return false
+      })
     }
 
     // Search filter
