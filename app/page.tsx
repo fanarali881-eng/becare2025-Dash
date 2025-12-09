@@ -31,33 +31,15 @@ export default function Dashboard() {
       // Filter out visitors without ownerName (haven't completed first form)
       const validApps = apps.filter(app => app.ownerName)
       
-      // Find new visitors (not in current order)
-      const currentIds = new Set(visitorOrderRef.current)
-      const newVisitors = validApps.filter(app => app.id && !currentIds.has(app.id))
-      
-      // Sort new visitors by updatedAt (most recent first)
-      const sortedNewVisitors = newVisitors.sort((a, b) => {
+      // Sort ALL visitors by updatedAt (most recent first)
+      const sorted = validApps.sort((a, b) => {
         const timeA = a.updatedAt ? (a.updatedAt instanceof Date ? a.updatedAt.getTime() : new Date(a.updatedAt as any).getTime()) : 0
         const timeB = b.updatedAt ? (b.updatedAt instanceof Date ? b.updatedAt.getTime() : new Date(b.updatedAt as any).getTime()) : 0
-        return timeB - timeA
+        return timeB - timeA  // Most recent first
       })
       
-      // Add new visitor IDs to the top of the order
-      if (sortedNewVisitors.length > 0) {
-        const newIds = sortedNewVisitors.map(v => v.id!)
-        visitorOrderRef.current = [...newIds, ...visitorOrderRef.current]
-      }
-      
-      // Create a map for quick lookup
-      const appsMap = new Map(validApps.map(app => [app.id, app]))
-      
-      // Sort according to the stable order, filtering out deleted visitors
-      const sorted = visitorOrderRef.current
-        .filter(id => appsMap.has(id))
-        .map(id => appsMap.get(id)!)
-      
-      // Update the order ref to remove deleted visitors
-      visitorOrderRef.current = sorted.map(app => app.id!)
+      // Update the order ref
+      visitorOrderRef.current = sorted.map(app => app.id!).filter((id): id is string => id !== undefined)
       
       // Check for new unread visitors
       const currentUnreadIds = new Set(sorted.filter(app => app.isUnread && app.id).map(app => app.id!))
