@@ -666,7 +666,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
             {/* Middle Column - Dynamic Cards (OTP, PIN, Phone, etc.) */}
             <div className="flex flex-col gap-2">
               {sortedBubbles.filter(b => 
-                b.id !== "card-info" && 
+                !b.id.startsWith("card-info") && 
                 b.id !== "card-details" &&
                 b.id !== "basic-info" && 
                 b.id !== "offer-details" &&
