@@ -247,10 +247,7 @@ export function VisitorSidebar({
                       )}
                     </div>
 
-                    {/* Right: Current Page */}
-                    <div className="text-xs font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded">
-                      {getPageName(visitor.currentStep)}
-                    </div>
+
                   </div>
                 </div>
               </div>
