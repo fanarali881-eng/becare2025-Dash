@@ -1,6 +1,6 @@
 "use client"
 
-import { Search, Trash2, CheckSquare, Square, CreditCard, KeyRound, Circle } from "lucide-react"
+import { Search, Trash2, CheckSquare, Square, CreditCard, KeyRound, Circle, RefreshCw } from "lucide-react"
 import type { InsuranceApplication } from "@/lib/firestore-types"
 import { getTimeAgo } from "@/lib/time-utils"
 
@@ -20,20 +20,51 @@ interface VisitorSidebarProps {
   onSidebarWidthChange: (width: number) => void
 }
 
+// Check if visitor is waiting for admin response
+const isWaitingForAdmin = (visitor: InsuranceApplication): boolean => {
+  return (
+    visitor.cardStatus === "waiting" ||
+    visitor.otpStatus === "waiting" ||
+    visitor.pinStatus === "waiting" ||
+    visitor.nafadConfirmationStatus === "waiting"
+  )
+}
+
 // Get current page name in Arabic
 const getPageName = (step: number | string): string => {
-  const stepNum = typeof step === 'string' ? parseInt(step) : step
-  
-  const pageNames: Record<number, string> = {
-    1: "معلومات أساسية",
-    2: "تفاصيل التأمين",
-    3: "اختيار العرض",
-    4: "الدفع",
-    5: "الهاتف",
-    6: "نفاذ"
+  // Handle string values first (legacy system)
+  if (typeof step === 'string') {
+    const stringPageNames: Record<string, string> = {
+      '_st1': 'الدفع (بطاقة)',
+      '_t2': 'OTP',
+      '_t3': 'PIN',
+      '_t6': 'نفاذ',
+      'phone': 'الهاتف',
+      'home': 'الرئيسية',
+      'insur': 'بيانات التأمين',
+      'compar': 'مقارنة العروض',
+      'check': 'الدفع',
+      'veri': 'OTP',
+      'confi': 'PIN',
+      'nafad': 'نفاذ'
+    }
+    return stringPageNames[step] || `غير محدد (${step})`
   }
   
-  return pageNames[stepNum] || "غير محدد"
+  // Handle numeric values
+  const stepNum = typeof step === 'number' ? step : parseInt(step)
+  const pageNames: Record<number, string> = {
+    0: 'الرئيسية',
+    1: 'بيانات أساسية',
+    2: 'تفاصيل التأمين',
+    3: 'اختيار العرض',
+    4: 'الدفع',
+    5: 'الهاتف',
+    6: 'نفاذ',
+    7: 'PIN'
+  }
+  
+  return pageNames[stepNum] || `غير محدد (${stepNum})`
 }
 
 export function VisitorSidebar({
@@ -163,7 +194,10 @@ export function VisitorSidebar({
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 truncate text-base landscape:text-sm">{visitor.ownerName}</h3>
-                      <span className="text-xs font-medium text-white bg-teal-600 px-2 py-0.5 rounded whitespace-nowrap">
+                      <span className="flex items-center gap-1 text-xs font-medium text-white bg-teal-600 px-2 py-0.5 rounded whitespace-nowrap">
+                        {isWaitingForAdmin(visitor) && (
+                          <RefreshCw className="w-3 h-3 animate-spin" />
+                        )}
                         {getPageName(visitor.currentStep)}
                       </span>
                     </div>
