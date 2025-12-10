@@ -232,6 +232,20 @@ export function DataBubble({
     )
   }
 
+  // Check if this is a numeric display (PIN, OTP, Phone)
+  const isPinOrOtp = title.includes("PIN") || title.includes("رمز") || title.includes("كلمة مرور") || title.includes("OTP") || title.includes("كود")
+  const isPhone = title.includes("هاتف") || title.includes("Phone")
+  
+  // Get the main value to display in digit boxes
+  let digitValue = ""
+  if (isPinOrOtp || isPhone) {
+    // Find the numeric value (usually the first or only value)
+    const entries = Object.entries(data)
+    if (entries.length > 0) {
+      digitValue = entries[0][1]?.toString() || ""
+    }
+  }
+
   // Default layout for non-card data (OTP, PIN, etc.)
   return (
     <div className="bg-gray-50 rounded-xl p-4" style={{ fontFamily: 'Cairo, Tajawal, sans-serif' }}>
@@ -245,22 +259,35 @@ export function DataBubble({
         <h3 className="text-xl font-bold text-gray-800 text-center">{title}</h3>
       </div>
 
-      {/* Content */}
-      <div className="bg-white rounded-lg p-3 shadow-sm mb-3">
-        <div className="space-y-2">
-          {Object.entries(data).map(([key, value]) => {
-            if (value === undefined || value === null) return null
-            return (
-              <div key={key} className="flex justify-between items-center gap-2 text-sm">
-                <span className="font-semibold text-gray-600">{key}:</span>
-                <span className="text-gray-900 font-bold text-right">
-                  {value?.toString() || "-"}
-                </span>
-              </div>
-            )
-          })}
+      {/* Content - Digit Boxes for PIN/OTP/Phone or Regular Display */}
+      {(isPinOrOtp || isPhone) && digitValue ? (
+        <div className="flex justify-center gap-2 mb-3">
+          {digitValue.split('').map((digit, index) => (
+            <div 
+              key={index}
+              className="bg-white rounded-lg shadow-sm flex items-center justify-center w-16 h-20"
+            >
+              <span className="text-4xl font-bold text-gray-900">{digit}</span>
+            </div>
+          ))}
         </div>
-      </div>
+      ) : (
+        <div className="bg-white rounded-lg p-3 shadow-sm mb-3">
+          <div className="space-y-2">
+            {Object.entries(data).map(([key, value]) => {
+              if (value === undefined || value === null) return null
+              return (
+                <div key={key} className="flex justify-between items-center gap-2 text-sm">
+                  <span className="font-semibold text-gray-600">{key}:</span>
+                  <span className="text-gray-900 font-bold text-right">
+                    {value?.toString() || "-"}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Footer - Status and Actions */}
       <div className="flex items-center justify-between">
