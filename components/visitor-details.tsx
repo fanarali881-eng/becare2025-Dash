@@ -593,7 +593,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
             <p>لا توجد بيانات لعرضها</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3 max-w-2xl mx-auto w-full" dir="rtl">
+          <div className={cardsLayout === "horizontal" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" : "flex flex-col gap-3 max-w-md mx-auto w-full"} dir="rtl">
           {sortedBubbles.map((bubble) => (
             <DataBubble
               key={bubble.id}

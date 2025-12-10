@@ -138,7 +138,7 @@ export function DataBubble({
         {/* Credit Card */}
         <div 
           className={`relative bg-gradient-to-br ${colorStyles.gradient} rounded-xl shadow-lg p-4 text-white overflow-hidden`}
-          style={{ aspectRatio: '1.586/1', maxWidth: '400px' }}
+          style={{ aspectRatio: '1.586/1' }}
         >
           {/* Card Background Pattern */}
           <div className="absolute inset-0 opacity-10">
@@ -198,7 +198,7 @@ export function DataBubble({
         </div>
 
         {/* Additional Info Below Card */}
-        <div className="bg-gray-50 rounded-lg p-2 border border-gray-200" style={{ maxWidth: '400px' }}>
+        <div className="bg-gray-50 rounded-lg p-2 border border-gray-200">
           <div className="flex items-center justify-between mb-1">
             <h4 className="text-xs font-bold text-gray-700">{title}</h4>
             {getStatusBadge()}
@@ -237,8 +237,8 @@ export function DataBubble({
   if (layout === "vertical") {
     return (
       <div 
-        className={`bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg shadow-sm p-2 border ${colorStyles.border} transition-all hover:shadow-md flex flex-col`}
-        style={{ fontFamily: 'Cairo, Tajawal, sans-serif', maxWidth: '400px' }}
+        className={`bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg shadow-sm p-2 border ${colorStyles.border} transition-all hover:shadow-md flex flex-col h-full`}
+        style={{ fontFamily: 'Cairo, Tajawal, sans-serif' }}
       >
         {/* Header */}
         <div className="flex items-center gap-2 mb-2 pb-1.5 border-b border-gray-200">
