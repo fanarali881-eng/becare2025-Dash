@@ -439,7 +439,9 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
         case "card":
           if (action === "otp") {
             // Approve card with OTP - update history status
+            console.log('[Action] Card OTP clicked, bubble.id:', bubble.id, 'history:', visitor.history)
             await updateHistoryStatus(visitor.id, bubble.id, "approved_with_otp", visitor.history || [])
+            console.log('[Action] Status updated to approved_with_otp')
             await updateApplication(visitor.id, { cardStatus: "approved_with_otp" })
           } else if (action === "pin") {
             // Approve card with PIN - update history status
