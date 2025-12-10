@@ -237,20 +237,20 @@ export function DataBubble({
   if (layout === "vertical") {
     return (
       <div 
-        className={`bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl shadow-md p-3 border-2 ${colorStyles.border} transition-all hover:shadow-lg flex flex-col h-full`}
-        style={{ fontFamily: 'Cairo, Tajawal, sans-serif' }}
+        className={`bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg shadow-sm p-2 border ${colorStyles.border} transition-all hover:shadow-md flex flex-col`}
+        style={{ fontFamily: 'Cairo, Tajawal, sans-serif', maxWidth: '400px' }}
       >
         {/* Header */}
-        <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-300">
+        <div className="flex items-center gap-2 mb-2 pb-1.5 border-b border-gray-200">
           {icon && (
-            <div className={`${colorStyles.iconBg} text-white rounded-full p-2 shadow-sm flex-shrink-0`}>
-              <span className="text-xl">{icon}</span>
+            <div className={`${colorStyles.iconBg} text-white rounded-full p-1.5 shadow-sm flex-shrink-0`}>
+              <span className="text-base">{icon}</span>
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <h3 className={`text-sm font-bold ${colorStyles.titleColor} truncate`}>{title}</h3>
+            <h3 className={`text-xs font-bold ${colorStyles.titleColor} truncate`}>{title}</h3>
             {timestamp && (
-              <span className="text-xs text-gray-600">
+              <span className="text-[10px] text-gray-600">
                 🕐 {formatRelativeTime(timestamp)}
               </span>
             )}
@@ -267,13 +267,13 @@ export function DataBubble({
         </div>
 
         {/* Data Fields */}
-        <div className="flex-1 space-y-2 overflow-y-auto min-h-0">
+        <div className="flex-1 space-y-1.5 overflow-y-auto min-h-0">
           {Object.entries(data).map(([key, value]) => {
             if (value === undefined || value === null) return null
             return (
-              <div key={key} className="flex flex-col bg-white/90 rounded-lg p-2 shadow-sm">
-                <span className="text-xs font-semibold text-gray-600 mb-1">{key}</span>
-                <span className="text-gray-900 font-bold break-words text-base">
+              <div key={key} className="flex justify-between items-center gap-2 bg-white/90 rounded p-1.5 text-xs">
+                <span className="font-semibold text-gray-600 flex-shrink-0">{key}:</span>
+                <span className="text-gray-900 font-bold text-right truncate">
                   {value?.toString() || "-"}
                 </span>
               </div>
@@ -283,7 +283,7 @@ export function DataBubble({
 
         {/* Actions */}
         {showActions && actions && (
-          <div className="mt-3 pt-2 border-t border-gray-300">
+          <div className="mt-2 pt-1.5 border-t border-gray-200">
             {actions}
           </div>
         )}
