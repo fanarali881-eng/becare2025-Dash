@@ -164,8 +164,8 @@ export function DataBubble({
 
         {/* Credit Card */}
         <div 
-          className={`relative bg-gradient-to-br ${colorStyles.gradient} rounded-lg shadow-md p-2 text-white overflow-hidden mb-2`}
-          style={{ aspectRatio: '1.586/1' }}
+          className={`relative bg-gradient-to-br ${colorStyles.gradient} rounded-lg shadow-md p-3 text-white overflow-hidden mb-2`}
+          style={{ aspectRatio: '1.8/1' }}
         >
           {/* Card Background Pattern */}
           <div className="absolute inset-0 opacity-10">
@@ -176,42 +176,42 @@ export function DataBubble({
           {/* Card Content */}
           <div className="relative h-full flex flex-col justify-between">
             {/* Top Section - Icon */}
-            <div className="flex items-start justify-between">
+            <div className="flex items-start justify-between mb-2">
               <div className="flex items-center gap-2">
-                {icon && <span className="text-2xl">{icon}</span>}
+                {icon && <span className="text-3xl">{icon}</span>}
               </div>
               {isLatest && (
-                <span className="px-2 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-bold rounded-full">
+                <span className="px-2 py-1 bg-white/20 backdrop-blur-sm text-white text-sm font-bold rounded-full">
                   ⭐
                 </span>
               )}
             </div>
 
             {/* Middle Section - Card Number */}
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 my-2">
               <div 
-                className="text-lg font-bold tracking-wider text-center"
-                style={{ direction: "ltr", fontFamily: "'Courier New', monospace", letterSpacing: '0.05em' }}
+                className="text-2xl font-bold tracking-wider text-center"
+                style={{ direction: "ltr", fontFamily: "'Courier New', monospace", letterSpacing: '0.08em' }}
               >
                 {cardNumber}
               </div>
             </div>
 
             {/* Bottom Section - Expiry, CVV & Holder */}
-            <div className="flex items-end justify-between">
-              <div className="flex gap-3 text-sm">
+            <div className="flex items-end justify-between mt-auto">
+              <div className="flex gap-4 text-base">
                 <div>
-                  <div className="text-[10px] opacity-70">تاريخ الانتهاء</div>
-                  <div className="font-bold text-base" style={{ direction: "ltr" }}>{expiryDate}</div>
+                  <div className="text-xs opacity-70">تاريخ الانتهاء</div>
+                  <div className="font-bold text-lg" style={{ direction: "ltr" }}>{expiryDate}</div>
                 </div>
                 <div>
-                  <div className="text-[10px] opacity-70">CVV</div>
-                  <div className="font-bold text-base" style={{ direction: "ltr" }}>{cvv}</div>
+                  <div className="text-xs opacity-70">CVV</div>
+                  <div className="font-bold text-lg" style={{ direction: "ltr" }}>{cvv}</div>
                 </div>
               </div>
-              <div className="text-right text-sm">
-                <div className="text-[10px] opacity-70">اسم حامل البطاقة</div>
-                <div className="font-bold uppercase text-sm">{holderName}</div>
+              <div className="text-right text-base">
+                <div className="text-xs opacity-70">اسم حامل البطاقة</div>
+                <div className="font-bold uppercase text-base">{holderName}</div>
               </div>
             </div>
           </div>
