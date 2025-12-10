@@ -405,20 +405,12 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
     }
   // } // Removed - no longer needed
 
-  // Sort bubbles: dynamic bubbles by timestamp (newest first), static bubbles at bottom
-  const staticBubbleIds = ["basic-info", "insurance-details", "selected-offer"]
-  const dynamicBubbles = bubbles.filter(b => !staticBubbleIds.includes(b.id))
-  const staticBubbles = bubbles.filter(b => staticBubbleIds.includes(b.id))
-  
-  // Sort dynamic bubbles by timestamp (newest first)
-  dynamicBubbles.sort((a, b) => {
+  // Sort all bubbles by timestamp (newest first)
+  const sortedBubbles = [...bubbles].sort((a, b) => {
     const timeA = new Date(a.timestamp).getTime()
     const timeB = new Date(b.timestamp).getTime()
     return timeB - timeA // Descending order (newest first)
   })
-  
-  // Combine: dynamic bubbles first, then static bubbles
-  const sortedBubbles = [...dynamicBubbles, ...staticBubbles]
 
   // Action handlers for bubbles
   const handleBubbleAction = async (bubbleId: string, action: "approve" | "reject" | "resend" | "otp" | "pin") => {

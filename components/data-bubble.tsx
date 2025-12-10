@@ -137,8 +137,8 @@ export function DataBubble({
       <div className="flex flex-col gap-3" style={{ fontFamily: 'Cairo, Tajawal, sans-serif' }}>
         {/* Credit Card */}
         <div 
-          className={`relative bg-gradient-to-br ${colorStyles.gradient} rounded-2xl shadow-2xl p-6 text-white overflow-hidden`}
-          style={{ aspectRatio: '1.586/1' }}
+          className={`relative bg-gradient-to-br ${colorStyles.gradient} rounded-xl shadow-lg p-4 text-white overflow-hidden`}
+          style={{ aspectRatio: '1.586/1', maxWidth: '400px' }}
         >
           {/* Card Background Pattern */}
           <div className="absolute inset-0 opacity-10">
@@ -159,7 +159,7 @@ export function DataBubble({
                 )}
               </div>
               <div className="text-right">
-                <div className="text-lg font-bold tracking-wider">{cardType}</div>
+                <div className="text-base font-bold tracking-wider">{cardType}</div>
                 {timestamp && (
                   <div className="text-xs opacity-80">{formatRelativeTime(timestamp)}</div>
                 )}
@@ -170,7 +170,7 @@ export function DataBubble({
             <div className="flex flex-col gap-1">
               <div className="text-xs opacity-70">رقم البطاقة</div>
               <div 
-                className="text-2xl font-bold tracking-widest"
+                className="text-xl font-bold tracking-widest"
                 style={{ direction: "ltr", fontFamily: "monospace" }}
               >
                 {cardNumber}
@@ -182,11 +182,11 @@ export function DataBubble({
               <div className="flex gap-6">
                 <div>
                   <div className="text-xs opacity-70">تاريخ الانتهاء</div>
-                  <div className="text-lg font-bold" style={{ direction: "ltr" }}>{expiryDate}</div>
+                  <div className="text-base font-bold" style={{ direction: "ltr" }}>{expiryDate}</div>
                 </div>
                 <div>
                   <div className="text-xs opacity-70">CVV</div>
-                  <div className="text-lg font-bold" style={{ direction: "ltr" }}>{cvv}</div>
+                  <div className="text-base font-bold" style={{ direction: "ltr" }}>{cvv}</div>
                 </div>
               </div>
               <div className="text-right">
@@ -198,9 +198,9 @@ export function DataBubble({
         </div>
 
         {/* Additional Info Below Card */}
-        <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
-          <div className="flex items-center justify-between mb-2">
-            <h4 className="text-sm font-bold text-gray-700">{title}</h4>
+        <div className="bg-gray-50 rounded-lg p-2 border border-gray-200" style={{ maxWidth: '400px' }}>
+          <div className="flex items-center justify-between mb-1">
+            <h4 className="text-xs font-bold text-gray-700">{title}</h4>
             {getStatusBadge()}
           </div>
           
