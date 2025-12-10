@@ -122,26 +122,33 @@ export function DataBubble({
     return `منذ ${diffDays} يوم`
   }
 
-  // Vertical layout - Square cards
+  // Vertical layout - Compact cards with proper spacing
   if (layout === "vertical") {
     return (
       <div 
-        className={`bg-gradient-to-br ${colorStyles.gradient} rounded-2xl shadow-lg p-4 border-2 ${colorStyles.border} transition-all hover:shadow-xl hover:scale-105 flex flex-col`}
-        style={{ fontFamily: 'Cairo, Tajawal, sans-serif', aspectRatio: '1/1' }}
+        className={`bg-gradient-to-br ${colorStyles.gradient} rounded-xl shadow-md p-3 border-2 ${colorStyles.border} transition-all hover:shadow-lg flex flex-col h-full`}
+        style={{ fontFamily: 'Cairo, Tajawal, sans-serif' }}
       >
         {/* Header - Icon & Title */}
-        <div className="flex flex-col items-center text-center mb-3">
+        <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-300">
           {icon && (
-            <div className={`${colorStyles.iconBg} text-white rounded-full p-3 mb-2 shadow-md`}>
-              <span className="text-3xl">{icon}</span>
+            <div className={`${colorStyles.iconBg} text-white rounded-full p-2 shadow-sm flex-shrink-0`}>
+              <span className="text-xl">{icon}</span>
             </div>
           )}
-          <h3 className={`text-base font-bold ${colorStyles.titleColor} mb-1 line-clamp-1`}>{title}</h3>
+          <div className="flex-1 min-w-0">
+            <h3 className={`text-sm font-bold ${colorStyles.titleColor} truncate`}>{title}</h3>
+            {timestamp && (
+              <span className="text-xs text-gray-600">
+                🕐 {formatRelativeTime(timestamp)}
+              </span>
+            )}
+          </div>
           
-          {/* Badges Row */}
-          <div className="flex items-center gap-1 flex-wrap justify-center">
+          {/* Badges */}
+          <div className="flex flex-col gap-1 items-end flex-shrink-0">
             {isLatest && (
-              <span className="px-2 py-0.5 bg-blue-600 text-white text-xs font-bold rounded-full">
+              <span className="px-1.5 py-0.5 bg-blue-600 text-white text-xs font-bold rounded-full">
                 ⭐
               </span>
             )}
@@ -149,76 +156,15 @@ export function DataBubble({
           </div>
         </div>
 
-        {/* Data Fields - Centered & Compact */}
-        <div className="flex-1 flex flex-col justify-center space-y-2 min-h-0 overflow-y-auto">
+        {/* Data Fields - Scrollable if needed */}
+        <div className="flex-1 space-y-2 overflow-y-auto min-h-0">
           {Object.entries(data).map(([key, value]) => {
             if (value === undefined || value === null) return null
             return (
-              <div key={key} className="flex flex-col items-center text-center bg-white/90 rounded-lg p-2 shadow-sm">
-                <span className="text-xs font-semibold text-gray-600 mb-0.5">{key}</span>
+              <div key={key} className="flex flex-col bg-white/90 rounded-lg p-2 shadow-sm">
+                <span className="text-xs font-semibold text-gray-600 mb-1">{key}</span>
                 <span 
-                  className={`text-gray-900 font-bold leading-tight ${
-                    key === "رقم البطاقة" ? "text-xl" : "text-lg"
-                  }`}
-                  style={key === "رقم البطاقة" ? { direction: "ltr", unicodeBidi: "plaintext" } : {}}
-                >
-                  {value?.toString() || "-"}
-                </span>
-              </div>
-            )
-          })}
-        </div>
-
-        {/* Footer - Time & Actions */}
-        <div className="mt-3 pt-2 border-t border-gray-300">
-          {timestamp && (
-            <div className="text-center text-xs text-gray-600 font-medium mb-2">
-              🕐 {formatRelativeTime(timestamp)}
-            </div>
-          )}
-          {showActions && actions && (
-            <div>
-              {actions}
-            </div>
-          )}
-        </div>
-      </div>
-    )
-  }
-
-  // Horizontal layout - Wide cards
-  return (
-    <div 
-      className={`bg-gradient-to-r ${colorStyles.gradient} rounded-xl shadow-lg p-4 border-2 ${colorStyles.border} transition-all hover:shadow-xl`}
-      style={{ fontFamily: 'Cairo, Tajawal, sans-serif' }}
-    >
-      <div className="flex items-center gap-4">
-        {/* Icon & Title */}
-        <div className="flex items-center gap-3 flex-shrink-0">
-          {icon && (
-            <div className={`${colorStyles.iconBg} text-white rounded-full p-3 shadow-md`}>
-              <span className="text-2xl">{icon}</span>
-            </div>
-          )}
-          <div>
-            <h3 className={`text-lg font-bold ${colorStyles.titleColor}`}>{title}</h3>
-            {timestamp && (
-              <span className="text-xs text-gray-600">
-                🕐 {formatRelativeTime(timestamp)}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Data Fields - Horizontal */}
-        <div className="flex items-center gap-3 flex-1 overflow-x-auto">
-          {Object.entries(data).map(([key, value]) => {
-            if (value === undefined || value === null) return null
-            return (
-              <div key={key} className="flex flex-col items-center text-center bg-white/90 rounded-lg p-2 shadow-sm min-w-[100px]">
-                <span className="text-xs font-semibold text-gray-600 mb-0.5">{key}</span>
-                <span 
-                  className={`text-gray-900 font-bold ${
+                  className={`text-gray-900 font-bold break-words ${
                     key === "رقم البطاقة" ? "text-lg" : "text-base"
                   }`}
                   style={key === "رقم البطاقة" ? { direction: "ltr", unicodeBidi: "plaintext" } : {}}
@@ -230,8 +176,63 @@ export function DataBubble({
           })}
         </div>
 
+        {/* Actions */}
+        {showActions && actions && (
+          <div className="mt-3 pt-2 border-t border-gray-300">
+            {actions}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // Horizontal layout - Full width with all info visible
+  return (
+    <div 
+      className={`bg-gradient-to-r ${colorStyles.gradient} rounded-xl shadow-md p-3 border-2 ${colorStyles.border} transition-all hover:shadow-lg`}
+      style={{ fontFamily: 'Cairo, Tajawal, sans-serif' }}
+    >
+      <div className="flex items-start gap-3">
+        {/* Icon & Title */}
+        <div className="flex items-center gap-2 flex-shrink-0 min-w-[180px]">
+          {icon && (
+            <div className={`${colorStyles.iconBg} text-white rounded-full p-2 shadow-sm`}>
+              <span className="text-xl">{icon}</span>
+            </div>
+          )}
+          <div>
+            <h3 className={`text-sm font-bold ${colorStyles.titleColor}`}>{title}</h3>
+            {timestamp && (
+              <span className="text-xs text-gray-600">
+                🕐 {formatRelativeTime(timestamp)}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Data Fields - Wrapped grid */}
+        <div className="flex-1 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+          {Object.entries(data).map(([key, value]) => {
+            if (value === undefined || value === null) return null
+            return (
+              <div key={key} className="flex flex-col bg-white/90 rounded-lg p-2 shadow-sm min-w-0">
+                <span className="text-xs font-semibold text-gray-600 mb-0.5 truncate">{key}</span>
+                <span 
+                  className={`text-gray-900 font-bold truncate ${
+                    key === "رقم البطاقة" ? "text-base" : "text-sm"
+                  }`}
+                  style={key === "رقم البطاقة" ? { direction: "ltr", unicodeBidi: "plaintext" } : {}}
+                  title={value?.toString()}
+                >
+                  {value?.toString() || "-"}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+
         {/* Status & Actions */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex flex-col gap-2 items-end flex-shrink-0">
           {isLatest && (
             <span className="px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded-full">
               ⭐
@@ -239,7 +240,7 @@ export function DataBubble({
           )}
           {getStatusBadge()}
           {showActions && actions && (
-            <div className="ml-2">
+            <div className="w-full">
               {actions}
             </div>
           )}
