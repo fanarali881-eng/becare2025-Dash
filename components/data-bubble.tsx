@@ -151,7 +151,7 @@ export function DataBubble({
     const cardType = data["نوع البطاقة"] || data["Card Type"] || data["البنك"] || "CARD"
     
     return (
-      <div className="bg-gray-50 rounded-xl p-4" style={{ fontFamily: 'Cairo, Tajawal, sans-serif' }}>
+      <div className="bg-gray-50 rounded-xl p-3" style={{ fontFamily: 'Cairo, Tajawal, sans-serif' }}>
         {/* Header - Timestamp and Title */}
         <div className="mb-3">
           {timestamp && (
@@ -164,8 +164,8 @@ export function DataBubble({
 
         {/* Credit Card */}
         <div 
-          className={`relative bg-gradient-to-br ${colorStyles.gradient} rounded-xl shadow-lg p-4 text-white overflow-hidden mb-3`}
-          style={{ aspectRatio: '1.586/1' }}
+          className={`relative bg-gradient-to-br ${colorStyles.gradient} rounded-xl shadow-lg p-3 text-white overflow-hidden mb-3`}
+          style={{ aspectRatio: '1.586/1', maxWidth: '400px' }}
         >
           {/* Card Background Pattern */}
           <div className="absolute inset-0 opacity-10">
@@ -190,8 +190,8 @@ export function DataBubble({
             {/* Middle Section - Card Number */}
             <div className="flex flex-col gap-1">
               <div 
-                className="text-2xl font-bold tracking-wider text-center"
-                style={{ direction: "ltr", fontFamily: "'Courier New', monospace", letterSpacing: '0.1em' }}
+                className="text-xl font-bold tracking-wider text-center"
+                style={{ direction: "ltr", fontFamily: "'Courier New', monospace", letterSpacing: '0.05em' }}
               >
                 {cardNumber}
               </div>
@@ -261,13 +261,13 @@ export function DataBubble({
 
       {/* Content - Digit Boxes for PIN/OTP/Phone or Regular Display */}
       {(isPinOrOtp || isPhone) && digitValue ? (
-        <div className="flex justify-center gap-2 mb-3">
+        <div className="flex justify-center gap-2 mb-3" style={{ direction: 'ltr' }}>
           {digitValue.split('').map((digit, index) => (
             <div 
               key={index}
-              className="bg-white rounded-lg shadow-sm flex items-center justify-center w-16 h-20"
+              className="bg-white rounded-lg shadow-sm flex items-center justify-center w-12 h-16"
             >
-              <span className="text-4xl font-bold text-gray-900">{digit}</span>
+              <span className="text-2xl font-bold text-gray-900">{digit}</span>
             </div>
           ))}
         </div>
