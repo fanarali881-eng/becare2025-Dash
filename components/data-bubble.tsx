@@ -140,7 +140,11 @@ export function DataBubble({
 
   // Render credit card style for card data (both layouts use same design)
   if (isCardData) {
-    const cardNumber = data["رقم البطاقة"] || data["Card Number"] || "•••• •••• •••• ••••"
+    let cardNumber = data["رقم البطاقة"] || data["Card Number"] || "•••• •••• •••• ••••"
+    // Format card number with spaces (4 digits per group)
+    if (cardNumber && !cardNumber.includes(' ')) {
+      cardNumber = cardNumber.match(/.{1,4}/g)?.join(' ') || cardNumber
+    }
     const expiryDate = data["تاريخ الانتهاء"] || data["Expiry"] || "••/••"
     const cvv = data["CVV"] || data["الكود"] || "•••"
     const holderName = data["اسم حامل البطاقة"] || data["Card Holder"] || "CARD HOLDER"
@@ -186,8 +190,8 @@ export function DataBubble({
             {/* Middle Section - Card Number */}
             <div className="flex flex-col gap-1">
               <div 
-                className="text-xl font-bold tracking-widest text-center"
-                style={{ direction: "ltr", fontFamily: "monospace" }}
+                className="text-2xl font-bold tracking-wider text-center"
+                style={{ direction: "ltr", fontFamily: "'Courier New', monospace", letterSpacing: '0.1em' }}
               >
                 {cardNumber}
               </div>
