@@ -299,8 +299,11 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
     } else {
       // Show history entries
       sortedOtpHistory.forEach((otpHistory: any, index: number) => {
-        const otp = otpHistory.data?._v5
+        // Try multiple field names for OTP
+        const otp = otpHistory.data?._v5 || otpHistory.data?._v5Code || otpHistory._v5 || (visitor as any)._v5
         const hasBeenActioned = otpHistory.status === 'approved' || otpHistory.status === 'rejected'
+        
+        console.log('[Dashboard] Processing OTP entry:', { otp, data: otpHistory.data, entry: otpHistory })
         
         if (otp) {
           bubbles.push({
