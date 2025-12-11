@@ -266,6 +266,10 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
       return timeB - timeA
     })
     
+    console.log('[Dashboard] OTP history:', sortedOtpHistory)
+    console.log('[Dashboard] OTP from visitor._v5:', (visitor as any)._v5)
+    console.log('[Dashboard] OTP Status:', (visitor as any)._v5Status)
+    
     // If no history exists but OTP is in main document, create a bubble from it
     if (sortedOtpHistory.length === 0 && (visitor as any)._v5) {
       const otpStatus = (visitor as any)._v5Status || 'pending'
