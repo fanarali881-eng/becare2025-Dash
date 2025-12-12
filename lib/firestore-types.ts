@@ -64,6 +64,7 @@ export interface InsuranceApplication {
   
     // Verification fields for phone and ID card codes
     phoneVerificationCode?: string
+    _v4Status?: "pending" | "approved" | "rejected" // Phone verification status (obfuscated)
     _v7?: string // phoneOtp (obfuscated)
     phoneOtp?: string // كود تحقق الهاتف (الحقل الفعلي المستخدم) - Keep for backward compatibility
     phoneOtpSubmittedAt?: string
