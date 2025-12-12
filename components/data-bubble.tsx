@@ -11,7 +11,7 @@ interface DataBubbleProps {
   isLatest?: boolean
   actions?: ReactNode
   icon?: string
-  color?: "blue" | "green" | "purple" | "orange" | "pink" | "indigo" | "gray"
+  color?: "blue" | "green" | "purple" | "orange" | "pink" | "indigo" | "gray" | "teal"
   layout?: "vertical" | "horizontal"
 }
 
@@ -94,6 +94,12 @@ export function DataBubble({
         border: 'border-gray-400',
         iconBg: 'bg-gray-500',
         titleColor: 'text-gray-900'
+      },
+      teal: {
+        gradient: 'from-teal-600 via-teal-500 to-teal-700',
+        border: 'border-teal-400',
+        iconBg: 'bg-teal-500',
+        titleColor: 'text-teal-900'
       }
     }
     

