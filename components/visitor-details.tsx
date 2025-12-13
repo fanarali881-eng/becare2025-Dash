@@ -537,6 +537,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
         return id.replace(/^(card-info-|otp-|pin-|phone_verification-|phone_otp-)/, '')
       }
       const historyId = getHistoryId(bubble.id)
+      console.log('[handleBubbleAction] bubble.id:', bubble.id, 'historyId:', historyId, 'bubble.type:', bubble.type, 'action:', action)
 
       switch (bubble.type) {
         case "card":
