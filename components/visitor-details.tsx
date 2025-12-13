@@ -702,7 +702,16 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
               isLatest={bubble.isLatest}
               layout="vertical"
               actions={
-                bubble.customActions ? bubble.customActions : bubble.showActions ? (
+                bubble.customActions ? bubble.customActions : 
+                bubble.status === "approved" ? (
+                  <div className="mt-3 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium text-center">
+                    ✓ تمت الموافقة
+                  </div>
+                ) : bubble.status === "rejected" ? (
+                  <div className="mt-3 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium text-center">
+                    ✗ تم الرفض
+                  </div>
+                ) : bubble.showActions ? (
                   <div className="flex gap-2 mt-3">
                     {bubble.type === "card" && (
                       <>
@@ -798,7 +807,16 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
               isLatest={bubble.isLatest}
               layout="vertical"
               actions={
-                bubble.customActions ? bubble.customActions : bubble.showActions ? (
+                bubble.customActions ? bubble.customActions : 
+                bubble.status === "approved" ? (
+                  <div className="mt-3 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium text-center">
+                    ✓ تمت الموافقة
+                  </div>
+                ) : bubble.status === "rejected" ? (
+                  <div className="mt-3 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium text-center">
+                    ✗ تم الرفض
+                  </div>
+                ) : bubble.showActions ? (
                   <div className="flex gap-2 mt-3">
                     {bubble.type === "otp" && (
                       <>
