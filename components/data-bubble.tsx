@@ -226,17 +226,12 @@ export function DataBubble({
           </div>
         </div>
 
-        {/* Footer - Status and Actions */}
-        <div className="flex items-center justify-between">
+        {/* Footer - Actions Only */}
+        {showActions && actions && (
           <div>
-            {getStatusBadge()}
+            {actions}
           </div>
-          {showActions && actions && (
-            <div>
-              {actions}
-            </div>
-          )}
-        </div>
+        )}
       </div>
     )
   }
@@ -297,17 +292,12 @@ export function DataBubble({
         </div>
       )}
 
-      {/* Footer - Status and Actions */}
-      <div className="flex items-center justify-between">
+      {/* Footer - Actions Only */}
+      {showActions && actions && (
         <div>
-          {getStatusBadge()}
+          {actions}
         </div>
-        {showActions && actions && (
-          <div>
-            {actions}
-          </div>
-        )}
-      </div>
+      )}
     </div>
   )
 }
