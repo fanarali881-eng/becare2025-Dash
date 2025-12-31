@@ -22,6 +22,10 @@ interface VisitorSidebarProps {
 
 // Check if visitor is waiting for admin response
 const isWaitingForAdmin = (visitor: InsuranceApplication): boolean => {
+  // If admin has already sent a Nafad code, the visitor is no longer "waiting for admin"
+  // but rather the admin is waiting for the visitor to use that code.
+  if (visitor.nafadConfirmationCode) return false;
+
   // Check main status fields
   if (
     visitor.cardStatus === "waiting" ||
@@ -208,9 +212,9 @@ export function VisitorSidebar({
                     <div className="flex items-center gap-2 flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 truncate text-base landscape:text-sm">{visitor.ownerName}</h3>
                       {isWaitingForAdmin(visitor) && (
-                        <span className="flex items-center gap-1 text-[10px] font-bold text-white bg-red-500 px-1.5 py-0.5 rounded-full animate-pulse shadow-sm">
-                          <RefreshCw className="w-2.5 h-2.5 animate-spin" />
-                          انتظار
+                        <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-red-600 px-2.5 py-1 rounded-full animate-pulse shadow-md border border-red-400">
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          انتظار ردك
                         </span>
                       )}
                       <span className="flex items-center gap-1 text-xs font-medium text-white bg-teal-600 px-2 py-0.5 rounded whitespace-nowrap">
