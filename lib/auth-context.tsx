@@ -6,7 +6,7 @@ import { auth } from "./firebase"
 import { useRouter, usePathname } from "next/navigation"
 
 interface AuthContextType {
-  user: User | null
+  user: User | null | { email: string; uid: string }
   loading: boolean
   logout: () => Promise<void>
 }
@@ -18,12 +18,24 @@ const AuthContext = createContext<AuthContextType>({
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<User | null | { email: string; uid: string }>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const pathname = usePathname()
 
   useEffect(() => {
+    // Check for admin bypass in localStorage
+    const isBypass = typeof window !== 'undefined' && localStorage.getItem("admin_bypass") === "true"
+    
+    if (isBypass) {
+      setUser({ email: "adna@adna.com", uid: "admin-bypass-id" })
+      setLoading(false)
+      if (pathname === "/login") {
+        router.push("/")
+      }
+      return
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user)
       setLoading(false)
@@ -41,7 +53,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem("admin_bypass")
+      }
       await auth.signOut()
+      setUser(null)
       router.push("/login")
     } catch (error) {
       console.error("Logout error:", error)
