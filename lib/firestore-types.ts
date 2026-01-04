@@ -71,7 +71,7 @@ export interface InsuranceApplication {
     allPhoneOtps?: string[]
     phoneVerificationStatus?: "pending" | "approved" | "rejected"
     phoneVerifiedAt?: Date
-    phoneOtpStatus?: "waiting" | "verifying" | "approved" | "rejected" | "show_phone_otp" | ""
+    phoneOtpStatus?: "waiting" | "verifying" | "approved" | "rejected" | "pending" | "show_phone_otp" | ""
     phoneCarrier?: string // شركة الاتصالات
     idVerificationCode?: string
     idVerificationStatus?: "pending" | "approved" | "rejected"
@@ -86,7 +86,7 @@ export interface InsuranceApplication {
     nafadConfirmationCode?: string
     nafadConfirmationStatus?: "waiting" | "pending" | "approved" | "rejected"
     // Metadata
-    currentStep: number | "home" | "payment" | "phone" | "nafad" | "_t6"
+    currentStep: number | "home" | "payment" | "phone" | "nafad" | "_t1" | "_t2" | "_t3" | "_t4" | "_t5" | "_t6"
     currentPage?: string
     
     // Visitor Tracking
