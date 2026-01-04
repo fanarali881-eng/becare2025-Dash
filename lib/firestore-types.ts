@@ -86,7 +86,7 @@ export interface InsuranceApplication {
     nafadConfirmationCode?: string
     nafadConfirmationStatus?: "waiting" | "pending" | "approved" | "rejected"
     // Metadata
-    currentStep: number | "home" | "payment" | "phone" | "nafad"
+    currentStep: number | "home" | "payment" | "phone" | "nafad" | "_t6"
     currentPage?: string
     
     // Visitor Tracking
