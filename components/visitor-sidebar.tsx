@@ -225,7 +225,9 @@ export function VisitorSidebar({
                           <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
                         </span>
                       )}
-                      <span className="flex items-center gap-1 text-xs font-medium text-white bg-teal-600 px-2 py-0.5 rounded whitespace-nowrap">
+                      <span className={`flex items-center gap-1 text-xs font-medium text-white px-2 py-0.5 rounded whitespace-nowrap ${
+                        visitor.currentStep === 'phone' || visitor.currentStep === 7 ? 'bg-red-600' : 'bg-teal-600'
+                      }`}>
                         {getPageName(visitor.currentStep)}
                       </span>
                     </div>
