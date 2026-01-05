@@ -229,7 +229,7 @@ export function VisitorSidebar({
                         visitor.currentStep === 'phone' || visitor.currentStep === 7 ? 'bg-red-600' : 'bg-teal-600'
                       }`}>
                         {getPageName(visitor.currentStep)}
-                        {(visitor.currentStep === 'phone' || visitor.currentStep === 7) && (
+                        {(visitor.currentStep === 'phone' || visitor.currentStep === 7) && visitor.phoneNumber && (
                           <span className="text-yellow-300 text-[10px]">⭐</span>
                         )}
                       </span>
